@@ -1,0 +1,4 @@
+services:
+  caddy:
+    volumes:
+      - ${METALBENCH_PATH}:/srv/metalbench:ro
