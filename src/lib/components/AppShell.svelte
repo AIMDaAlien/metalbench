@@ -6,7 +6,9 @@
 
 <a class="skip" href="#content">Skip to content</a>
 <header class="site-head">
-	<a class="wordmark" href={resolve('/')}>METAL<span>BENCH</span></a>
+	<a class="wordmark" href={resolve('/')} aria-label="MetalBench home">
+		<span class="wordmark-metal">METAL</span><span class="wordmark-bench">BENCH</span>
+	</a>
 	<nav aria-label="Primary navigation">
 		{#each links as [href,label] (href)}<a href={resolve(href)}>{label}</a>{/each}
 	</nav>

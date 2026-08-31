@@ -45,6 +45,96 @@
       ],
       "weaknesses": ["Not tested on the published nine-task agent run"],
       "recommendation": "Use when fitting Flash-Next comfortably in 128 GB matters."
+    },
+    {
+      "slug": "qwen38-27b-4bit",
+      "name": "Qwen3.8 27B 4-bit",
+      "family": "Qwen3.8",
+      "parameters": "27B dense hybrid",
+      "summary": "The Mac agentic default, tested across rapid-mlx and LM Studio NAX.",
+      "strengths": ["308/317 fingerprint score", "17/17 hard-agentic score", "Fast long-context prefill in LM Studio NAX"],
+      "weaknesses": ["Consistent multi-step arithmetic misses", "MTP did not improve decode on this Mac"],
+      "recommendation": "Use rapid-mlx for agents and LM Studio NAX for long-context ingestion."
+    },
+    {
+      "slug": "qwen38-27b-axq6",
+      "name": "Qwen3.8 27B AXQ 6-bit",
+      "family": "Qwen3.8",
+      "parameters": "27B dense hybrid",
+      "summary": "A larger Mac quant that showed no quality gain over 4-bit.",
+      "strengths": ["30/33 precision score", "Fits within 48 GB unified memory"],
+      "weaknesses": ["Slower than 4-bit", "No measured quality advantage"],
+      "recommendation": "Skip it; the 4-bit build is smaller, faster, and scored better."
+    },
+    {
+      "slug": "qwen38-27b-8bit",
+      "name": "Qwen3.8 27B 8-bit",
+      "family": "Qwen3.8",
+      "parameters": "27B dense hybrid",
+      "summary": "The high-memory quant that lost speed without fixing model-level errors.",
+      "strengths": ["30/33 precision score"],
+      "weaknesses": ["9.05 tok/s decode", "29.5 GB weights", "Previously crashed at 256K context"],
+      "recommendation": "Do not use on this 48 GB Mac; 4-bit is the better configuration."
+    },
+    {
+      "slug": "gemma4-12b-qat-q8",
+      "name": "Gemma 4 12B QAT Q8",
+      "family": "Gemma 4",
+      "parameters": "12B multimodal",
+      "summary": "The careful Mac all-rounder with the best documented OCR result of the pair.",
+      "strengths": ["68/76 full-suite score", "40/40 knowledge", "6/6 research tool use"],
+      "weaknesses": ["About 7 tok/s", "Weak strict-summary score"],
+      "recommendation": "Use when OCR detail matters more than response speed."
+    },
+    {
+      "slug": "gemma4-12b-qat-q4",
+      "name": "Gemma 4 12B QAT Q4",
+      "family": "Gemma 4",
+      "parameters": "12B multimodal",
+      "summary": "The smaller Gemma configuration with the same documented text score as Q8.",
+      "strengths": ["55/58 text score", "40/40 knowledge", "Smaller than Q8"],
+      "weaknesses": ["OCR fell to 4/8", "About 7.4 tok/s"],
+      "recommendation": "Use for careful text and multimodal work when Q8 OCR precision is unnecessary."
+    },
+    {
+      "slug": "lfm25-8b-a1b",
+      "name": "LFM2.5 8B-A1B",
+      "family": "LFM2.5",
+      "parameters": "8.3B MoE / 1.5B active",
+      "summary": "The fastest strong interactive result in the legacy Mac text battery.",
+      "strengths": ["107 tok/s", "53/58 text score", "6/6 research and 8/8 planning"],
+      "weaknesses": ["Occasional first-attempt tool-call retry", "Weak strict-summary score"],
+      "recommendation": "Use for responsive companion and agent loops."
+    },
+    {
+      "slug": "lfm25-26b",
+      "name": "LFM2.5 2.6B",
+      "family": "LFM2.5",
+      "parameters": "2.6B dense",
+      "summary": "A tiny Mac model with strong legacy text-battery coverage.",
+      "strengths": ["76.8 tok/s", "3.4 GB RSS", "53/58 text score"],
+      "weaknesses": ["Verbose reasoning hurt summaries", "38/40 knowledge"],
+      "recommendation": "Use for low-footprint interactive loops."
+    },
+    {
+      "slug": "ternary-bonsai-27b",
+      "name": "Ternary Bonsai 27B",
+      "family": "Ternary Bonsai",
+      "parameters": "27B ternary / 2-bit",
+      "summary": "A compact dense fallback with solid text competence but slow decode.",
+      "strengths": ["53/58 text score", "7.1 GB RSS", "6/6 research tool use"],
+      "weaknesses": ["6.4 tok/s", "No edge over faster Mac options"],
+      "recommendation": "Keep as a fallback, not the daily default."
+    },
+    {
+      "slug": "maple-preview-20b",
+      "name": "Maple Preview 20B",
+      "family": "Maple Preview",
+      "parameters": "20B MoE / 1B active ternary",
+      "summary": "An unusually fast reasoning preview constrained by its runtime’s missing tool API.",
+      "strengths": ["172.5 tok/s", "2.2 GB RSS", "38/40 knowledge"],
+      "weaknesses": ["46/58 text score", "Runtime had no native tool calling"],
+      "recommendation": "Use for raw reasoning experiments, not agentic workflows."
     }
   ],
   "hardware": [
@@ -61,6 +151,16 @@
       ],
       "memoryBudget": "Keep total weights and runtime overhead below available host RAM; leave headroom for the OS and shared services.",
       "bottleneck": "Single-stream Flash-Next decode is limited by DDR4 memory bandwidth, not idle GPU compute."
+    },
+    {
+      "slug": "macbook-pro-m5-pro-48gb",
+      "name": "MacBook Pro M5 Pro 48 GB",
+      "cpu": "Apple M5 Pro",
+      "memory": "48 GB unified memory",
+      "gpu": "Apple integrated GPU / Metal",
+      "publicNotes": ["MLX-native local inference", "Shared memory holds weights, KV cache, runtime, and applications", "Benchmarks include rapid-mlx, mlx-lm, and LM Studio NAX"],
+      "memoryBudget": "Leave enough unified memory for macOS and Veyra; 4-bit 27B weights fit comfortably, while 8-bit becomes restrictive at long context.",
+      "bottleneck": "Dense-model decode is primarily memory-bandwidth bound; runtime choice matters more for prefill than steady decode."
     }
   ],
   "benchmarks": [
@@ -75,6 +175,36 @@
       "name": "Quant-sensitivity battery",
       "version": "1",
       "description": "Forty-two deterministic arithmetic, exact-token, JSON, counting, multihop, adherence, and long-context checks."
+    },
+    {
+      "slug": "mac-full-76",
+      "name": "Mac multimodal battery",
+      "version": "1",
+      "description": "Seventy-six deterministic vision, OCR, summary, knowledge, research, and planning checks."
+    },
+    {
+      "slug": "mac-text-58",
+      "name": "Mac text battery",
+      "version": "1",
+      "description": "Fifty-eight deterministic knowledge, research, planning, and summary checks."
+    },
+    {
+      "slug": "qwen38-fingerprint",
+      "name": "Qwen3.8 fingerprint battery",
+      "version": "1",
+      "description": "A 317-question deterministic bank across 28 domains."
+    },
+    {
+      "slug": "qwen38-precision",
+      "name": "Qwen3.8 quant precision battery",
+      "version": "1",
+      "description": "Thirty-three deterministic arithmetic, exact-format, and multi-condition logic tasks."
+    },
+    {
+      "slug": "runtime-throughput",
+      "name": "Runtime throughput probe",
+      "version": "1",
+      "description": "A completed local throughput probe; its pass count records completion, not model quality."
     }
   ],
   "runs": [
@@ -172,6 +302,162 @@
         "One miss was recorded as a reasoning-budget exhaustion",
         "Must not inherit the Q3_K_XL agent score"
       ]
+    },
+    {
+      "id": "qwen38-4bit-fingerprint-2026-08-18",
+      "measuredAt": "2026-08-18T00:00:00Z",
+      "modelSlug": "qwen38-27b-4bit",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "qwen38-fingerprint",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-qwen38-fingerprint-317",
+      "runtime": { "name": "rapid-mlx", "version": "0.12.12", "quant": "MLX 4-bit", "contextTokens": 32768, "concurrency": 1 },
+      "score": { "passed": 308, "total": 317 },
+      "performance": { "decodeTokensPerSecond": 14.5 },
+      "performanceDisplay": "14–15 tok/s observed range",
+      "evidence": { "level": "documented-local", "sourceTitle": "Qwen3.8-27B — Deploy, Benchmarks, Verdict", "sourceDate": "2026-08-18", "limitations": ["Transcribed from an Obsidian note", "Raw result files are not yet published", "Decode speed is an observed range"] },
+      "caveats": ["Three documented misses included multi-step arithmetic", "17/17 hard-agentic was a separate battery"]
+    },
+    {
+      "id": "qwen38-4bit-precision-2026-08-18",
+      "measuredAt": "2026-08-18T00:00:00Z",
+      "modelSlug": "qwen38-27b-4bit",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "qwen38-precision",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-qwen38-precision-33",
+      "runtime": { "name": "rapid-mlx", "version": "0.12.12", "quant": "MLX 4-bit", "contextTokens": 32768, "concurrency": 1 },
+      "score": { "passed": 31, "total": 33 },
+      "performance": { "decodeTokensPerSecond": 14.5 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Qwen3.8-27B — Deploy, Benchmarks, Verdict", "sourceDate": "2026-08-18", "limitations": ["Transcribed from an Obsidian note", "Raw result files are not yet published"] },
+      "caveats": ["Temperature zero", "Same arithmetic weaknesses persisted at higher quants"]
+    },
+    {
+      "id": "qwen38-axq6-precision-2026-08-18",
+      "measuredAt": "2026-08-18T00:00:00Z",
+      "modelSlug": "qwen38-27b-axq6",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "qwen38-precision",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-qwen38-precision-33",
+      "runtime": { "name": "rapid-mlx", "version": "0.12.12", "quant": "AXQ 6-bit", "contextTokens": 32768, "concurrency": 1 },
+      "score": { "passed": 30, "total": 33 },
+      "performance": { "decodeTokensPerSecond": 13.3, "prefillTokensPerSecond": 68 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Qwen3.8-27B — Deploy, Benchmarks, Verdict", "sourceDate": "2026-08-18", "limitations": ["Transcribed from an Obsidian note", "Raw result files are not yet published"] },
+      "caveats": ["No quality gain over 4-bit", "Prefill was slower than the 4-bit baseline"]
+    },
+    {
+      "id": "qwen38-8bit-precision-2026-08-18",
+      "measuredAt": "2026-08-18T00:00:00Z",
+      "modelSlug": "qwen38-27b-8bit",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "qwen38-precision",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-qwen38-precision-33",
+      "runtime": { "name": "rapid-mlx", "version": "0.12.12", "quant": "MLX 8-bit", "contextTokens": 32768, "concurrency": 1 },
+      "score": { "passed": 30, "total": 33 },
+      "performance": { "decodeTokensPerSecond": 9.05, "hostRamGiB": 29.5 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Qwen3.8-27B — Deploy, Benchmarks, Verdict", "sourceDate": "2026-08-18", "limitations": ["Transcribed from an Obsidian note", "Raw result files are not yet published", "Memory value is model size, not whole-process RSS"] },
+      "caveats": ["No quality gain over 4-bit", "A 256K-context attempt previously crashed the Mac"]
+    },
+    {
+      "id": "qwen38-lmstudio-prefill-2026-08-18",
+      "measuredAt": "2026-08-18T00:00:00Z",
+      "modelSlug": "qwen38-27b-4bit",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "runtime-throughput",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-qwen38-runtime-probe-32k",
+      "runtime": { "name": "LM Studio NAX", "version": "local-build", "quant": "MTPLX optimized 4-bit", "contextTokens": 32768, "concurrency": 1 },
+      "score": { "passed": 1, "total": 1, "metric": "probe completed" },
+      "performance": { "decodeTokensPerSecond": 12.6, "prefillTokensPerSecond": 254 },
+      "performanceDisplay": "12.4–12.8 tok/s decode; 254 tok/s prefill",
+      "evidence": { "level": "documented-local", "sourceTitle": "Qwen3.8-27B — Deploy, Benchmarks, Verdict", "sourceDate": "2026-08-18", "limitations": ["Transcribed from an Obsidian note", "This probe measures runtime throughput, not answer quality", "Decode is an observed range"] },
+      "caveats": ["Not comparable to quality batteries", "Best documented 32K prefill result"]
+    },
+    {
+      "id": "gemma4-q8-full-2026-08-09",
+      "measuredAt": "2026-08-09T00:00:00Z",
+      "modelSlug": "gemma4-12b-qat-q8",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "mac-full-76",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-mac-full-76",
+      "runtime": { "name": "rapid-mlx", "version": "local-build", "quant": "MLX QAT 8-bit", "contextTokens": 128000, "concurrency": 1 },
+      "score": { "passed": 68, "total": 76 },
+      "performance": { "decodeTokensPerSecond": 7, "hostRamGiB": 13 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Gemma 4 12B QAT Q8", "sourceDate": "2026-08-09", "limitations": ["Transcribed from an Obsidian note", "Raw harness output is not yet published", "RAM is the documented warm value"] },
+      "caveats": ["Vision 7/10", "OCR 6/8", "Summary 1/4"]
+    },
+    {
+      "id": "gemma4-q4-full-2026-08-09",
+      "measuredAt": "2026-08-09T00:00:00Z",
+      "modelSlug": "gemma4-12b-qat-q4",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "mac-full-76",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-mac-full-76",
+      "runtime": { "name": "rapid-mlx", "version": "local-build", "quant": "MLX QAT 4-bit", "contextTokens": 128000, "concurrency": 1 },
+      "score": { "passed": 66, "total": 76 },
+      "performance": { "decodeTokensPerSecond": 7.4, "hostRamGiB": 9.7 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Gemma 4 12B QAT Q4", "sourceDate": "2026-08-09", "limitations": ["Transcribed from an Obsidian note", "Raw harness output is not yet published", "RAM is the documented warm value"] },
+      "caveats": ["OCR 4/8", "Text-only score was 55/58"]
+    },
+    {
+      "id": "lfm25-8b-text-2026-08-09",
+      "measuredAt": "2026-08-09T00:00:00Z",
+      "modelSlug": "lfm25-8b-a1b",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "mac-text-58",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-mac-text-58",
+      "runtime": { "name": "rapid-mlx", "version": "local-build", "quant": "MLX 8-bit", "contextTokens": 128000, "concurrency": 1 },
+      "score": { "passed": 53, "total": 58 },
+      "performance": { "decodeTokensPerSecond": 107, "hostRamGiB": 9.1 },
+      "evidence": { "level": "documented-local", "sourceTitle": "LFM2.5-8B-A1B", "sourceDate": "2026-08-09", "limitations": ["Transcribed from an Obsidian note", "Raw harness output is not yet published"] },
+      "caveats": ["First tool-call attempt sometimes required retry", "Summary score documented as 1–2/4"]
+    },
+    {
+      "id": "lfm25-26b-text-2026-08-09",
+      "measuredAt": "2026-08-09T00:00:00Z",
+      "modelSlug": "lfm25-26b",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "mac-text-58",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-mac-text-58",
+      "runtime": { "name": "rapid-mlx", "version": "local-build", "quant": "MLX 8-bit", "contextTokens": 128000, "concurrency": 1 },
+      "score": { "passed": 53, "total": 58 },
+      "performance": { "decodeTokensPerSecond": 76.8, "hostRamGiB": 3.4 },
+      "evidence": { "level": "documented-local", "sourceTitle": "LFM2.5-2.6B", "sourceDate": "2026-08-09", "limitations": ["Transcribed from an Obsidian note", "Raw harness output is not yet published"] },
+      "caveats": ["Summary 0/4 due partly to verbose chain of thought", "38/40 knowledge"]
+    },
+    {
+      "id": "bonsai-27b-text-2026-08-09",
+      "measuredAt": "2026-08-09T00:00:00Z",
+      "modelSlug": "ternary-bonsai-27b",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "mac-text-58",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-mac-text-58",
+      "runtime": { "name": "rapid-mlx", "version": "local-build", "quant": "MLX ternary 2-bit", "contextTokens": 128000, "concurrency": 1 },
+      "score": { "passed": 53, "total": 58 },
+      "performance": { "decodeTokensPerSecond": 6.4, "hostRamGiB": 7.1 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Ternary Bonsai 27B", "sourceDate": "2026-08-09", "limitations": ["Transcribed from an Obsidian note", "Raw harness output is not yet published", "Two misses were described as grader artifacts"] },
+      "caveats": ["Effective score was estimated as 55/58 after grader artifacts", "Published score remains the literal 53/58"]
+    },
+    {
+      "id": "maple-preview-text-2026-08-09",
+      "measuredAt": "2026-08-09T00:00:00Z",
+      "modelSlug": "maple-preview-20b",
+      "hardwareSlug": "macbook-pro-m5-pro-48gb",
+      "benchmarkSlug": "mac-text-58",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-mac-text-58",
+      "runtime": { "name": "mlx-lm DeepGrove fork", "version": "local-build", "quant": "MLX ternary 2-bit", "contextTokens": 128000, "concurrency": 1 },
+      "score": { "passed": 46, "total": 58 },
+      "performance": { "decodeTokensPerSecond": 172.5, "hostRamGiB": 2.2 },
+      "evidence": { "level": "documented-local", "sourceTitle": "Maple-Preview 20B", "sourceDate": "2026-08-09", "limitations": ["Transcribed from an Obsidian note", "Raw harness output is not yet published", "Research misses reflect the runtime’s absent native tool API"] },
+      "caveats": ["Research 0/6 because the server lacked native tool calling", "Preview model"]
     }
   ],
   "findings": [
