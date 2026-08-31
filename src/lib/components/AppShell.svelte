@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	let { children } = $props();
-	const links = [['/compare','Compare'],['/methodology','Methodology'],['/findings','Findings']] as const;
+	const links = [['/explore','Explore'],['/compare','Compare'],['/methodology','Methodology'],['/findings','Findings']] as const;
 </script>
 
 <a class="skip" href="#content">Skip to content</a>

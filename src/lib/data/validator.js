@@ -19,6 +19,8 @@ const evidenceLevels = new Set([
   "published-external",
 ]);
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const architectures = new Set(["dense", "moe", "dense-hybrid"]);
+const memoryKinds = new Set(["warm-rss", "peak-rss", "weights-only", "combined-ram"]);
 
 export function validateRun(run) {
   const errors = [];
@@ -47,6 +49,12 @@ export function validateRun(run) {
     errors.push("runtime.concurrency must be positive");
   if (!evidenceLevels.has(run.evidence?.level))
     errors.push("unknown evidence level");
+  if (run.performance?.hostRamGiB != null)
+    errors.push("use structured performance.memory instead of hostRamGiB");
+  if (run.performance?.memory &&
+      (!Number.isFinite(run.performance.memory.gib) || run.performance.memory.gib <= 0 ||
+       !memoryKinds.has(run.performance.memory.kind)))
+    errors.push("performance.memory must have positive gib and a known kind");
   if (
     run.evidence?.level === "documented-local" &&
     (!run.evidence.sourceTitle ||
@@ -79,7 +87,7 @@ export function validateRun(run) {
 
 export function validateCatalog(catalog) {
   const errors = [];
-  for (const key of ["models", "hardware", "benchmarks", "runs", "findings"])
+  for (const key of ["models", "hardware", "benchmarks", "runs", "useCases", "findings"])
     if (!Array.isArray(catalog[key])) errors.push(`${key} must be an array`);
   if (errors.length) return errors;
   const unique = (items, key, label) => {
@@ -95,6 +103,22 @@ export function validateCatalog(catalog) {
   const benchmarks = unique(catalog.benchmarks, "slug", "benchmark");
   const runs = unique(catalog.runs, "id", "run");
   unique(catalog.findings, "slug", "finding");
+  unique(catalog.useCases, "slug", "use case");
+  const useCases = new Set(catalog.useCases.map((item) => item.slug));
+  for (const model of catalog.models) {
+    if (!slug.test(model.familySlug || "")) errors.push(`${model.slug}: invalid familySlug`);
+    if (!architectures.has(model.architecture)) errors.push(`${model.slug}: invalid architecture`);
+    if (!Number.isFinite(model.parameterCount?.totalBillions) ||
+        !Number.isFinite(model.parameterCount?.activeBillions) ||
+        model.parameterCount.activeBillions > model.parameterCount.totalBillions)
+      errors.push(`${model.slug}: invalid parameterCount`);
+    if (!Number.isFinite(model.quant?.bits) || !model.quant.family)
+      errors.push(`${model.slug}: invalid quant metadata`);
+    if (!model.modalities?.length || !model.capabilities?.length)
+      errors.push(`${model.slug}: modalities and capabilities are required`);
+    for (const useCase of model.bestUseCases || [])
+      if (!useCases.has(useCase)) errors.push(`${model.slug}: unknown use case ${useCase}`);
+  }
   for (const run of catalog.runs) {
     for (const error of validateRun(run))
       errors.push(`${run.id || "run"}: ${error}`);
@@ -107,6 +131,14 @@ export function validateCatalog(catalog) {
   for (const finding of catalog.findings)
     for (const id of finding.runIds || [])
       if (!runs.has(id)) errors.push(`${finding.slug}: unknown run ${id}`);
+  for (const useCase of catalog.useCases) {
+    if (!models.has(useCase.winnerModelSlug)) errors.push(`${useCase.slug}: unknown winner`);
+    if (!models.has(useCase.runnerUpModelSlug)) errors.push(`${useCase.slug}: unknown runner-up`);
+    if (!useCase.explanation || !useCase.limitations?.length || !useCase.runIds?.length)
+      errors.push(`${useCase.slug}: incomplete use-case evidence`);
+    for (const id of useCase.runIds || [])
+      if (!runs.has(id)) errors.push(`${useCase.slug}: unknown run ${id}`);
+  }
   return errors;
 }
 

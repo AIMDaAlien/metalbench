@@ -9,5 +9,7 @@ export const load: PageLoad = ({ params }) => {
   return {
     model,
     runs: catalog.runs.filter((run) => run.modelSlug === params.slug),
+    siblings: catalog.models.filter((item) => item.familySlug === model.familySlug && item.slug !== model.slug),
+    useCases: catalog.useCases.filter((item) => item.winnerModelSlug === model.slug || item.runnerUpModelSlug === model.slug),
   };
 };

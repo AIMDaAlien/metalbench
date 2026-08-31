@@ -27,10 +27,11 @@ const base = {
   caveats: [],
 };
 const catalogFor = (run) => ({
-  models: [{ slug: "model" }],
+  models: [{ slug: "model", familySlug: "model", parameterCount: { totalBillions: 1, activeBillions: 1 }, architecture: "dense", modalities: ["text"], capabilities: ["test"], bestUseCases: [], quant: { bits: 4, family: "Q4" } }],
   hardware: [{ slug: "hardware" }],
   benchmarks: [{ slug: "bench" }],
   runs: [run],
+  useCases: [],
   findings: [],
 });
 describe("catalog validation", () => {

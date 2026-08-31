@@ -40,7 +40,7 @@ export interface BenchmarkRun {
     prefillTokensPerSecond?: number;
     wallSeconds?: number;
     vramGiB?: number;
-    hostRamGiB?: number;
+    memory?: { gib: number; kind: "warm-rss" | "peak-rss" | "weights-only" | "combined-ram" };
   };
   performanceDisplay?: string;
   evidence: Evidence;
@@ -49,13 +49,29 @@ export interface BenchmarkRun {
 }
 export interface Model {
   slug: string;
+  familySlug: string;
   name: string;
   family: string;
   parameters: string;
+  parameterCount: { totalBillions: number; activeBillions: number };
+  architecture: "dense" | "moe" | "dense-hybrid";
+  modalities: string[];
+  capabilities: string[];
+  bestUseCases: string[];
+  quant: { bits: number; family: string };
   summary: string;
   strengths: string[];
   weaknesses: string[];
   recommendation: string;
+}
+export interface UseCase {
+  slug: string;
+  name: string;
+  winnerModelSlug: string;
+  runnerUpModelSlug: string;
+  runIds: string[];
+  explanation: string;
+  limitations: string[];
 }
 export interface Hardware {
   slug: string;
@@ -86,6 +102,7 @@ export const catalog: {
     description: string;
   }[];
   runs: BenchmarkRun[];
+  useCases: UseCase[];
   findings: Finding[];
 };
 export function getModel(slug: string): Model | undefined;
