@@ -1,0 +1,15 @@
+# Unraid deployment runbook
+
+MetalBench is a separate static build. Penthouse exposes the finished tree read-only at `/srv/metalbench`; no Penthouse application route changes are needed.
+
+1. Commit the exact MetalBench source and run every local gate.
+2. Confirm `build/revision.txt` equals `git rev-parse HEAD`.
+3. Confirm Cloudflare A records for `penthouse.blog`, `api.penthouse.blog`, and `metalbench.penthouse.blog` resolve to the current WAN address. Repair DDNS before proceeding if any differ.
+4. Back up the existing MetalBench tree and active Caddy configuration.
+5. Copy `build/` to a staging directory on Unraid.
+6. Mount the promoted directory read-only as `/srv/metalbench` in the existing Caddy container and add `ops/Caddyfile.metalbench` to its configuration.
+7. Run `caddy validate` inside the existing container before reload.
+8. Atomically rename the staged tree into place, reload Caddy, then check public home, compare, representative dynamic routes, an artifact when present, and `revision.txt`.
+9. Confirm Penthouse root and API health still return `200`.
+
+If any public check fails, restore both backed-up tree and Caddy configuration, validate, and reload. Do not add SPA rewrites or API routes.

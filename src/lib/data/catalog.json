@@ -1,0 +1,194 @@
+{
+  "models": [
+    {
+      "slug": "qwen36-nvfp4",
+      "name": "Qwen3.6 NVFP4",
+      "family": "Qwen3.6",
+      "parameters": "27B dense",
+      "summary": "The interactive-speed recommendation for this machine.",
+      "strengths": [
+        "Fast local decode",
+        "Good general agent behavior",
+        "Strong tool-use baseline"
+      ],
+      "weaknesses": [
+        "Missed two strict-output constraints in the documented agent run"
+      ],
+      "recommendation": "Use for interactive coding and daily agent work where latency matters."
+    },
+    {
+      "slug": "flash-next-q3kxl",
+      "name": "Flash-Next Q3_K_XL",
+      "family": "Qwen3.8 Flash-Next",
+      "parameters": "176B MoE / 6B active",
+      "summary": "The strict-adherence recommendation when latency is acceptable.",
+      "strengths": [
+        "Perfect documented nine-task agent score",
+        "Reliable structured output"
+      ],
+      "weaknesses": [
+        "About four times slower than Qwen3.6 on this box",
+        "Memory-bandwidth bound"
+      ],
+      "recommendation": "Use for strict instructions and high-consequence formatting."
+    },
+    {
+      "slug": "flash-next-iq3xxs",
+      "name": "Flash-Next IQ3_XXS",
+      "family": "Qwen3.8 Flash-Next",
+      "parameters": "176B MoE / 6B active",
+      "summary": "The memory-efficient quant result from a separate sensitivity battery.",
+      "strengths": [
+        "16.92 tok/s with 16 threads",
+        "41/42 quant-battery score",
+        "Lower RAM use than Q3_K_XL"
+      ],
+      "weaknesses": ["Not tested on the published nine-task agent run"],
+      "recommendation": "Use when fitting Flash-Next comfortably in 128 GB matters."
+    }
+  ],
+  "hardware": [
+    {
+      "slug": "unraid-128gb-rtx3060",
+      "name": "Unraid 128 GB + RTX 3060",
+      "cpu": "Intel Core i5-12600KF",
+      "memory": "128 GB DDR4-3200",
+      "gpu": "NVIDIA RTX 3060 12 GB",
+      "publicNotes": [
+        "CPU-offloaded MoE inference",
+        "Approximately 6.3 GiB VRAM used by the Q3_K_XL configuration",
+        "Model weights stream from host memory"
+      ],
+      "memoryBudget": "Keep total weights and runtime overhead below available host RAM; leave headroom for the OS and shared services.",
+      "bottleneck": "Single-stream Flash-Next decode is limited by DDR4 memory bandwidth, not idle GPU compute."
+    }
+  ],
+  "benchmarks": [
+    {
+      "slug": "agent-benchmark",
+      "name": "Deterministic agent benchmark",
+      "version": "1",
+      "description": "Nine tool-use, recovery, constraint, and format tasks graded without an LLM judge."
+    },
+    {
+      "slug": "quant-sensitivity",
+      "name": "Quant-sensitivity battery",
+      "version": "1",
+      "description": "Forty-two deterministic arithmetic, exact-token, JSON, counting, multihop, adherence, and long-context checks."
+    }
+  ],
+  "runs": [
+    {
+      "id": "qwen36-nvfp4-agent-2026-08-28",
+      "measuredAt": "2026-08-28T00:00:00Z",
+      "modelSlug": "qwen36-nvfp4",
+      "hardwareSlug": "unraid-128gb-rtx3060",
+      "benchmarkSlug": "agent-benchmark",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-agent-v1-nine-tasks",
+      "runtime": {
+        "name": "FreeToken",
+        "version": "0.1.2",
+        "quant": "NVFP4",
+        "contextTokens": 32768,
+        "concurrency": 1
+      },
+      "score": { "passed": 7, "total": 9 },
+      "performance": { "decodeTokensPerSecond": 61.5 },
+      "performanceDisplay": "58–65 tok/s observed range",
+      "evidence": {
+        "level": "documented-local",
+        "sourceTitle": "Unraid Qwen3.8 notes",
+        "sourceDate": "2026-08-28",
+        "limitations": [
+          "Transcribed from a local note",
+          "Raw run output is unavailable",
+          "Decode speed is an observed range"
+        ]
+      },
+      "caveats": ["Failed strict JSON shape and banned-word adherence"]
+    },
+    {
+      "id": "flash-next-q3kxl-agent-2026-08-28",
+      "measuredAt": "2026-08-28T00:00:00Z",
+      "modelSlug": "flash-next-q3kxl",
+      "hardwareSlug": "unraid-128gb-rtx3060",
+      "benchmarkSlug": "agent-benchmark",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-agent-v1-nine-tasks",
+      "runtime": {
+        "name": "llama.cpp",
+        "version": "local-build",
+        "quant": "Q3_K_XL",
+        "contextTokens": 32768,
+        "reasoningEffort": "low",
+        "concurrency": 1
+      },
+      "score": { "passed": 9, "total": 9 },
+      "performance": { "decodeTokensPerSecond": 14.5, "vramGiB": 6.3 },
+      "evidence": {
+        "level": "documented-local",
+        "sourceTitle": "Unraid Qwen3.8 notes",
+        "sourceDate": "2026-08-28",
+        "limitations": [
+          "Transcribed from a local note",
+          "Raw run output is unavailable"
+        ]
+      },
+      "caveats": [
+        "CPU-offloaded MoE",
+        "Latency is materially higher than Qwen3.6"
+      ]
+    },
+    {
+      "id": "flash-next-iq3xxs-quant-2026-08-29",
+      "measuredAt": "2026-08-29T00:00:00Z",
+      "modelSlug": "flash-next-iq3xxs",
+      "hardwareSlug": "unraid-128gb-rtx3060",
+      "benchmarkSlug": "quant-sensitivity",
+      "benchmarkVersion": "1",
+      "taskSetHash": "sha256:documented-quant-v1-42-tasks",
+      "runtime": {
+        "name": "llama.cpp",
+        "version": "local-build",
+        "quant": "IQ3_XXS",
+        "contextTokens": 32768,
+        "threadCount": 16,
+        "concurrency": 1
+      },
+      "score": { "passed": 41, "total": 42 },
+      "performance": { "decodeTokensPerSecond": 16.92 },
+      "evidence": {
+        "level": "documented-local",
+        "sourceTitle": "Unraid Qwen3.8 notes",
+        "sourceDate": "2026-08-29",
+        "limitations": [
+          "Transcribed from a local note",
+          "Raw battery output is unavailable",
+          "This is not the nine-task agent run"
+        ]
+      },
+      "caveats": [
+        "One miss was recorded as a reasoning-budget exhaustion",
+        "Must not inherit the Q3_K_XL agent score"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "slug": "speculative-decoding-memory-wall",
+      "title": "Speculation doesn’t beat a memory bottleneck",
+      "publishedAt": "2026-08-29",
+      "summary": "MTP accepted roughly 0.8 of drafted tokens but produced no wall-clock improvement on CPU-offloaded Flash-Next.",
+      "body": [
+        "The documented baseline measured 14.67 tok/s. The MTP run measured approximately 13.6–14 tok/s despite acceptance near 0.8.",
+        "The practical conclusion is narrow: on this memory-bandwidth-bound configuration, accepted speculative tokens did not translate into faster single-stream decode."
+      ],
+      "runIds": ["flash-next-q3kxl-agent-2026-08-28"],
+      "limitations": [
+        "Transcribed from local notes",
+        "No raw timing artifact is currently public"
+      ]
+    }
+  ]
+}
