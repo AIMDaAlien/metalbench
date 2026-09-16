@@ -1,0 +1,39 @@
+{
+  "runId": "qwen38-27b-q5-webpage-production-2026-09-16",
+  "benchmark": "webpage-production v1",
+  "description": "One open-ended production brief: build a complete, self-contained product webpage for a local-AI operations persona. Graded by deterministic render, console, asset, and style checks; no LLM judge.",
+  "hardware": {
+    "profile": "BigRig: Intel Core i5-13600K (14 cores / 20 threads), 30 GB DDR5, AMD RX 9060 XT 16 GB + NVIDIA RTX 3060 12 GB",
+    "notes": [
+      "Dual-GPU desktop; integrated UHD 770 carries the display so both dGPUs stay available for compute",
+      "952 GB NVMe root with large headroom for working sets"
+    ]
+  },
+  "runtime": {
+    "engine": "opencode agent session",
+    "model": "Swift-Qwen3.8-27B-Q5_K_M.gguf (27B dense, Q5_K_M)",
+    "quant": "Q5_K_M",
+    "contextTokens": 32768
+  },
+  "result": {
+    "artifactPage": "/webpages/qwen38-27b-q5/",
+    "files": [
+      "index.html (single self-contained page, inline CSS and JS)",
+      "fonts/Ubuntu-Regular.ttf",
+      "fonts/Ubuntu-Bold.ttf",
+      "fonts/Ubuntu-Italic.ttf"
+    ],
+    "checks": [
+      "Headless Chromium render: zero console errors",
+      "No gradients, emoji, or substituted dashes in the final page",
+      "HTML tag balance verified",
+      "Embedded JavaScript passes node --check",
+      "All local font references resolve against the shipped fonts directory"
+    ]
+  },
+  "notes": [
+    "Completion task: the score records that the page was produced and passes its checks, not model quality",
+    "No decode or prefill throughput was measured in this run",
+    "JetBrains Mono falls back to the system mono stack when absent; the three Ubuntu faces are committed with the page"
+  ]
+}

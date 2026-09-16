@@ -1,0 +1,34 @@
+{
+  "runId": "qfn-iq3xxs-262k-unraid-2026-09-06",
+  "benchmark": "throughput-sweep v1",
+  "description": "Decode tokens per second at full 262144-token context, three runs at 400 max output tokens, temperature 0.7, concurrency 1, after rebuilding llama.cpp on September 6 master.",
+  "hardware": {
+    "profile": "consumer desktop, DDR4 dual channel, 12 GB GPU",
+    "notes": [
+      "Hybrid GDN+QSA architecture: only 12 of 48 layers carry a KV cache",
+      "262K KV at q8_0 is about 3.4 GB; GDN layers keep a fixed recurrent state",
+      "All 48 MoE expert layers on CPU (ncmoe 48); PLE n-gram table on CPU",
+      "16 decode threads, 12 batch threads, performance governor"
+    ]
+  },
+  "runtime": {
+    "engine": "llama.cpp",
+    "version": "master 2026-09-06 or later (includes 7 qwen4exp fixes incl. GDN normalization correction and CUDA sparse-FA)",
+    "quant": "IQ3_XXS",
+    "contextTokens": 262144
+  },
+  "results": {
+    "decodeRunsTokPerSec": [14.3, 15.1],
+    "mean": 14.7
+  },
+  "comparison": {
+    "sameModel128kPriorBuild": 13.3,
+    "note": "The master rebuild gained speed despite raising context from 128K to 262K."
+  },
+  "notes": [
+    "VRAM 10.6 of 12 GB under load.",
+    "Round-trip generation verified at 262K slot allocation.",
+    "Prefill, not decode, dominates wall time for long prompts."
+  ],
+  "caveats": ["Throughput probe only; no quality grading in this run."]
+}

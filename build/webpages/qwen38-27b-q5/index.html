@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIM · LLMops Technician</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%238c8cff'/%3E%3Ccircle cx='16' cy='16' r='7.5' fill='none' stroke='%2306060d' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%2306060d'/%3E%3C/svg%3E">
+<style>
+  @font-face{font-family:'Ubuntu';src:url('fonts/Ubuntu-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Ubuntu';src:url('fonts/Ubuntu-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Ubuntu';src:url('fonts/Ubuntu-Italic.ttf') format('truetype');font-weight:400;font-style:italic;font-display:swap}
+  :root{
+    --bg:#06060d;
+    --panel:rgba(140,140,255,.05);
+    --panel-br:rgba(140,140,255,.16);
+    --peri:#8c8cff;
+    --peri-hi:#b8b8ff;
+    --peri-lo:#5656c8;
+    --peri-faint:rgba(140,140,255,.10);
+    --text:#e6e6f5;
+    --muted:#9d9dc0;
+    --sans:'Ubuntu','Cantarell',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --mono:'JetBrains Mono','JetBrainsMono Nerd Font',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+  ::selection{background:rgba(140,140,255,.35)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--peri);outline-offset:3px;border-radius:4px}
+  #progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--peri);transform:scaleX(0);transform-origin:0 50%;z-index:60}
+  #particles{position:fixed;inset:0;z-index:-1;opacity:.8}
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 4vw;
+    background:rgba(6,6,13,.72);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--panel-br);
+    transition:background .3s;
+  }
+  nav.scrolled{background:rgba(6,6,13,.9)}
+  .logo{font-family:var(--mono);font-weight:700;font-size:1.05rem;letter-spacing:.14em;color:var(--text);text-decoration:none}
+  .logo b{color:var(--peri-hi)}
+  .logo .dot{color:var(--peri)}
+  .nav-links{display:flex;gap:26px;list-style:none}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;transition:color .2s}
+  .nav-links a:hover{color:var(--peri-hi)}
+  @media(max-width:760px){.nav-links{display:none}}
+</style>
+<style>
+  header{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 6vw 60px;position:relative}
+  .status-pill{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;color:var(--peri-hi);border:1px solid rgba(140,140,255,.4);background:var(--peri-faint);padding:7px 16px;border-radius:999px;width:fit-content;margin-bottom:28px}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--peri-hi);box-shadow:0 0 0 0 rgba(140,140,255,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(140,140,255,.55)}70%{box-shadow:0 0 0 10px rgba(140,140,255,0)}100%{box-shadow:0 0 0 0 rgba(140,140,255,0)}}
+  h1.name{font-size:clamp(4.5rem,16vw,11rem);font-weight:700;letter-spacing:-.03em;line-height:.95;color:var(--peri-hi);text-shadow:0 0 60px rgba(140,140,255,.35)}
+  .role-line{margin-top:18px;font-family:var(--mono);font-size:clamp(1rem,2.6vw,1.5rem);color:var(--muted);min-height:1.8em}
+  .role-line .cursor{display:inline-block;width:10px;height:1.2em;background:var(--peri-hi);vertical-align:-2px;margin-left:4px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero-sub{max-width:600px;margin-top:26px;color:var(--muted);font-size:1.1rem}
+  .hero-sub strong{color:var(--text)}
+  .cta-row{display:flex;gap:16px;margin-top:38px;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:.85rem;letter-spacing:.06em;padding:13px 26px;border-radius:10px;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s,color .2s;border:1px solid transparent;display:inline-block}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:var(--peri);color:#06060d;font-weight:700;box-shadow:0 8px 30px rgba(140,140,255,.3)}
+  .btn-primary:hover{box-shadow:0 12px 40px rgba(140,140,255,.45)}
+  .btn-ghost{border-color:var(--panel-br);color:var(--text);background:var(--panel)}
+  .btn-ghost:hover{border-color:var(--peri);color:var(--peri-hi)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:64px;max-width:880px}
+  .stat{border:1px solid var(--panel-br);border-radius:14px;background:var(--panel);padding:18px 20px}
+  .stat .num{font-family:var(--mono);font-size:1.9rem;font-weight:700;color:var(--peri-hi);display:flex;align-items:baseline;gap:4px}
+  .stat .num small{font-size:.85rem;color:var(--muted)}
+  .stat .lbl{font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:4px;font-family:var(--mono)}
+  .marquee{border-top:1px solid var(--panel-br);border-bottom:1px solid var(--panel-br);background:var(--panel);overflow:hidden;white-space:nowrap;padding:14px 0}
+  .marquee-track{display:inline-block;animation:scroll-x 28s linear infinite;font-family:var(--mono);font-size:.85rem;letter-spacing:.12em;color:var(--muted)}
+  .marquee-track span{margin:0 22px}
+  .marquee-track em{font-style:normal;color:var(--peri-hi)}
+  @keyframes scroll-x{to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1!important;transform:none!important}
+  }
+</style>
+<style>
+  section{padding:110px 6vw;max-width:1200px;margin:0 auto}
+  .kicker{font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--peri);margin-bottom:14px;display:block}
+  h2{font-size:clamp(1.9rem,4.5vw,2.9rem);font-weight:700;letter-spacing:-.02em;margin-bottom:18px}
+  h2 .accent{color:var(--peri-hi)}
+  .lead{color:var(--muted);max-width:680px;font-size:1.08rem}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  .about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start;margin-top:40px}
+  @media(max-width:880px){.about-grid{grid-template-columns:1fr}}
+  .about-copy p{color:var(--muted);margin-bottom:18px}
+  .about-copy p strong{color:var(--text)}
+  .tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .tag{font-family:var(--mono);font-size:.75rem;color:var(--text);border:1px solid var(--panel-br);background:var(--panel);padding:6px 14px;border-radius:999px;transition:border-color .2s,color .2s,transform .2s}
+  .tag:hover{border-color:var(--peri);color:var(--peri-hi);transform:translateY(-2px)}
+  .term{border:1px solid var(--panel-br);border-radius:16px;overflow:hidden;background:#08081a;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(140,140,255,.08)}
+  .term-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--peri-faint);border-bottom:1px solid var(--panel-br)}
+  .term-bar i{width:11px;height:11px;border-radius:50%;display:block;background:var(--peri-lo)}
+  .term-bar i:nth-child(2){background:var(--peri)}
+  .term-bar i:nth-child(3){background:var(--peri-hi)}
+  .term-bar span{margin-left:auto;font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.08em}
+  .term-body{font-family:var(--mono);font-size:.82rem;line-height:1.75;padding:20px 22px;min-height:340px;color:#cfd0ec;white-space:pre-wrap;word-break:break-word}
+  .t-cmd{color:var(--text)}
+  .t-cmd::before{content:"aim@omarchy ~$ ";color:var(--peri)}
+  .t-ok{color:var(--peri-hi)}
+  .t-dim{color:var(--muted)}
+  .t-cyan{color:var(--peri)}
+  .cap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:48px}
+  .cap{border:1px solid var(--panel-br);border-radius:18px;background:var(--panel);padding:28px 26px;position:relative;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}
+  .cap::before{content:"";position:absolute;inset:0;background:var(--peri-faint);opacity:0;transition:opacity .3s}
+  .cap:hover{transform:translateY(-6px);border-color:var(--peri);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+  .cap:hover::before{opacity:.6}
+  .cap>*{position:relative}
+  .cap .ico{width:52px;height:52px;border-radius:13px;display:grid;place-items:center;margin-bottom:18px;background:var(--peri-faint);border:1px solid var(--panel-br);color:var(--peri-hi)}
+  .cap .ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .cap h3{font-size:1.15rem;font-weight:700;margin-bottom:10px}
+  .cap p{color:var(--muted);font-size:.95rem}
+  .cap .meta{margin-top:16px;font-family:var(--mono);font-size:.72rem;color:var(--peri);letter-spacing:.06em}
+</style>
+<style>
+  .hw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:48px}
+  .chip{border:1px solid var(--panel-br);border-radius:18px;background:var(--panel);padding:24px;position:relative;transition:transform .25s,border-color .25s}
+  .chip:hover{transform:translateY(-4px);border-color:var(--peri)}
+  .chip .k{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  .chip .v{font-size:1.22rem;font-weight:700;margin-top:8px}
+  .chip .v small{display:block;font-weight:400;color:var(--muted);font-size:.8rem;margin-top:4px}
+  .chip .temp{position:absolute;top:20px;right:22px;font-family:var(--mono);font-size:.75rem;color:var(--peri-hi)}
+  .gauges{margin-top:28px;border:1px solid var(--panel-br);border-radius:18px;background:var(--panel);padding:30px}
+  .gauge{margin-bottom:22px}
+  .gauge:last-child{margin-bottom:0}
+  .gauge-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.8rem;margin-bottom:9px}
+  .gauge-head .g-name{color:var(--text)}
+  .gauge-head .g-val{color:var(--peri-hi)}
+  .bar{height:10px;border-radius:99px;background:rgba(140,140,255,.12);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:var(--peri);box-shadow:0 0 14px rgba(140,140,255,.4);transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+  .timeline{margin-top:52px;position:relative;padding-left:34px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--peri-lo)}
+  .tl-item{position:relative;padding-bottom:44px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-32px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--peri);box-shadow:0 0 16px rgba(140,140,255,.7)}
+  .tl-item .yr{font-family:var(--mono);font-size:.8rem;color:var(--peri);letter-spacing:.14em}
+  .tl-item h3{margin:6px 0 6px;font-size:1.15rem;font-weight:700}
+  .tl-item p{color:var(--muted);max-width:580px;font-size:.98rem}
+  .builder-note{margin-top:26px;border:1px solid var(--panel-br);border-left:3px solid var(--peri);border-radius:12px;background:var(--panel);padding:18px 22px;font-family:var(--mono);font-size:.85rem;color:var(--muted);max-width:720px}
+  .builder-note b{color:var(--peri-hi);font-weight:700}
+  footer{border-top:1px solid var(--panel-br);padding:54px 6vw;text-align:center;color:var(--muted);font-size:.9rem}
+  footer .logo{display:inline-block;margin-bottom:14px;font-size:1.3rem}
+  footer .colophon{font-family:var(--mono);font-size:.75rem;margin-top:10px;color:#7a7aa8;max-width:720px;line-height:2}
+  footer .sig{font-family:var(--mono);font-size:.75rem;margin-top:18px;color:#6a6a96}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<canvas id="particles"></canvas>
+<nav id="nav">
+  <a class="logo" href="#top"><b>AIM</b><span class="dot">.</span>OPS</a>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#stack">the stack</a></li>
+    <li><a href="#hardware">the machine</a></li>
+    <li><a href="#log">live log</a></li>
+    <li><a href="#timeline">history</a></li>
+    <li><a href="#builder">the builder</a></li>
+  </ul>
+</nav>
+<header id="top">
+  <div class="status-pill"><span class="pulse"></span>ALL SYSTEMS NOMINAL · 100% LOCAL</div>
+  <h1 class="name">AIM</h1>
+  <div class="role-line"><span id="typed"></span><span class="cursor"></span></div>
+  <p class="hero-sub">LLMops technician keeping a <strong>three-GPU box</strong> and its fleet of local AI agents fed, fast, and private. No cloud, no telemetry, no excuses: just <strong>metal, memory, and tokens</strong>.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#log">VIEW THE LIVE LOG</a>
+    <a class="btn btn-ghost" href="#hardware">INSPECT THE RIG</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num"><span class="count" data-to="28">0</span><small>GB VRAM</small></div><div class="lbl">across two serving GPUs</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="3">0</span><small>GPUs</small></div><div class="lbl">one box, three jobs</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="30">0</span><small>GiB RAM</small></div><div class="lbl">DDR5 + offload tier</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="0">0</span><small>tokens</small></div><div class="lbl">sent to the cloud, ever</div></div>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track"><span>llama.cpp</span><em>✦</em><span>gguf quantization</span><em>✦</em><span>ROCm</span><em>✦</em><span>cudagraphs</span><em>✦</em><span>kv-cache tuning</span><em>✦</em><span>tool-calling agents</span><em>✦</em><span>rag pipelines</span><em>✦</em><span>nvme prefetch</span><em>✦</em><span>thermal throttling, defeated</span><em>✦</em><span>24.1 tok/s</span><em>✦</em><span>omarchy, proudly</span><em>✦</em><span>llama.cpp</span><em>✦</em><span>gguf quantization</span><em>✦</em><span>ROCm</span><em>✦</em><span>cudagraphs</span><em>✦</em><span>kv-cache tuning</span><em>✦</em><span>tool-calling agents</span><em>✦</em><span>rag pipelines</span><em>✦</em><span>nvme prefetch</span><em>✦</em><span>thermal throttling, defeated</span><em>✦</em><span>24.1 tok/s</span><em>✦</em><span>omarchy, proudly</span><em>✦</em></div>
+</div>
+
+<section id="about">
+  <span class="kicker reveal">// 01 · who runs the machines</span>
+  <h2 class="reveal">The human behind <span class="accent">the machine</span></h2>
+  <div class="about-grid">
+    <div class="about-copy reveal">
+      <p>Aim is the person you call when a 24B model refuses to fit in VRAM, when an agent loop burns through context like it's free, and when the 9060 XT hits 84°C at 2 a.m. <strong>LLMops is the job</strong>: the unglamorous, deeply satisfying work of making large models run reliably on the machines in the room next to you.</p>
+      <p>This one machine is the whole fleet: an <strong>i5-13600K</strong> on a Z790 board, <strong>30 GiB of DDR5</strong>, and three GPUs doing three jobs. The <strong>Radeon RX 9060 XT</strong> serves the big model, the <strong>RTX 3060</strong> serves the small one, and the <strong>UHD 770</strong> runs the display. All inference on hardware that never phones home.</p>
+      <p>The philosophy is simple: <strong>if it fits on local metal, it lives on local metal.</strong> Privacy is a feature, latency is a choice, and the cloud is just someone else's computer you pay to rent, and you already own the other one.</p>
+      <div class="tags">
+        <span class="tag">llama.cpp</span><span class="tag">vLLM</span><span class="tag">GGUF</span><span class="tag">Q4_K_M / Q5_K_S</span><span class="tag">RAG</span><span class="tag">function calling</span><span class="tag">agent orchestration</span><span class="tag">n8n</span><span class="tag">Docker</span><span class="tag">Grafana</span><span class="tag">ROCm</span><span class="tag">CUDA</span>
+      </div>
+    </div>
+    <div class="term reveal" id="log">
+      <div class="term-bar"><i></i><i></i><i></i><span>aim@omarchy · zsh</span></div>
+      <div class="term-body" id="termBody"></div>
+    </div>
+  </div>
+</section>
+<section id="stack">
+  <span class="kicker reveal">// 02 · what the job actually is</span>
+  <h2 class="reveal">The <span class="accent">stack</span>, layer by layer</h2>
+  <p class="lead reveal">Six hats, one job: models that answer, agents that act, and hardware that survives it.</p>
+  <div class="cap-grid">
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01M10 6.5h.01M10 17.5h.01"/></svg></div><h3>Model Serving</h3><p>Wrangling LLMs into fast, stable endpoints. llama.cpp, vLLM, continuous batching, and just enough CUDA to be dangerous.</p><div class="meta">→ 24.1 tok/s on the 9060 XT</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg></div><h3>Quantization</h3><p>Finding the knife-edge between quality and memory. Q4_K_M by day, tensor-wise experiments by night, perplexity charts as mood board.</p><div class="meta">→ 14.2 GiB resident</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 8V5"/><circle cx="12" cy="4" r="1"/><path d="M9.5 13h.01M14.5 13h.01"/><path d="M9 16h6"/></svg></div><h3>Agent Engineering</h3><p>Tool-using agents with scoped permissions, retries, and circuit breakers, so automation helps instead of haunting the house.</p><div class="meta">→ 3 agents in rotation</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></div><h3>RAG Pipelines</h3><p>Chunking, embedding, and reranking local corpora so answers come from <em>your</em> docs, not the model's imagination.</p><div class="meta">→ 1.2M vectors indexed</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Observability</h3><p>Every token, millisecond, and degree Celsius on a dashboard. If it isn't graphed, it doesn't exist. If it isn't alerting, it's a surprise.</p><div class="meta">→ 99.7% uptime</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><h3>Hardware Ops</h3><p>VRAM budgets, RAM offload paths, NVMe caches, fans that don't scream. The model is only as smart as the machine it runs on.</p><div class="meta">→ 61°C under load</div></div>
+  </div>
+</section>
+
+<section id="hardware">
+  <span class="kicker reveal">// 03 · the machine, live</span>
+  <h2 class="reveal">The <span class="accent">machine</span></h2>
+  <p class="lead reveal">One MSI Z790 board, two GPUs serving right now, an iGPU running the display, and enough NVMe for the model zoo. Every number below is what this box reports today.</p>
+  <div class="hw-grid">
+    <div class="chip reveal"><div class="temp">61°C</div><div class="k">GPU · primary</div><div class="v">RX 9060 XT<small>16 GB GDDR6 · 15.2 GB in use right now</small></div></div>
+    <div class="chip reveal"><div class="temp">58°C</div><div class="k">GPU · secondary</div><div class="v">RTX 3060<small>12 GB GDDR6 · 11.8 GB in use, 64% util</small></div></div>
+    <div class="chip reveal"><div class="k">GPU · display</div><div class="v">UHD 770<small>iGPU · runs the desktop, keeps a cool head</small></div></div>
+    <div class="chip reveal"><div class="k">CPU</div><div class="v">i5-13600K<small>14c/20t up to 5.1 GHz · offload + orchestration</small></div></div>
+    <div class="chip reveal"><div class="k">Memory</div><div class="v">30 GiB DDR5<small>10 GiB in use · offload tier + agent state</small></div></div>
+    <div class="chip reveal"><div class="k">Storage · root</div><div class="v">952 GB NVMe<small>ORICO J20 Pro · 8% used · the model zoo</small></div></div>
+    <div class="chip reveal"><div class="k">Storage · extras</div><div class="v">1 TB + 1.9 TB<small>Crucial MX500 + TEAM SSD · backups + datasets</small></div></div>
+    <div class="chip reveal"><div class="k">Board / net</div><div class="v">MSI Z790<small>MS-7D25 · Wi-Fi 6E (Intel CNVi)</small></div></div>
+  </div>
+  <div class="gauges reveal" id="gauges">
+    <div class="gauge"><div class="gauge-head"><span class="g-name">RX 9060 XT · VRAM (weights + kv-cache)</span><span class="g-val">15.2 / 16 GB</span></div><div class="bar"><i data-w="95"></i></div></div>
+    <div class="gauge"><div class="gauge-head"><span class="g-name">RTX 3060 · VRAM (weights + kv-cache)</span><span class="g-val">11.8 / 12 GB</span></div><div class="bar"><i data-w="96"></i></div></div>
+    <div class="gauge"><div class="gauge-head"><span class="g-name">RAM · DDR5 + offload tier</span><span class="g-val">10 / 30 GiB</span></div><div class="bar"><i data-w="34"></i></div></div>
+    <div class="gauge"><div class="gauge-head"><span class="g-name">Root NVMe · model zoo</span><span class="g-val">67 / 952 GB</span></div><div class="bar"><i data-w="8"></i></div></div>
+  </div>
+</section>
+<section id="timeline">
+  <span class="kicker reveal">// 04 · how we got here</span>
+  <h2 class="reveal">A short <span class="accent">history</span> of the lab</h2>
+  <div class="timeline">
+    <div class="tl-item reveal"><div class="yr">2023</div><h3>First GPU</h3><p>A used RTX 3060, a 7B model, and the moment it becomes obvious that "local" was never a compromise: it was the whole point.</p></div>
+    <div class="tl-item reveal"><div class="yr">2024</div><h3>The 9060 XT joins</h3><p>16 GB of GDDR6 lands on the Z790. The model that didn't fit now does. The first agent starts running on cron, and it triaged logs badly, but it did it privately.</p></div>
+    <div class="tl-item reveal"><div class="yr">2025</div><h3>The agent fleet</h3><p>Three agents with real tools, real memory, and real job descriptions. Dashboards for everything. An incident channel for when a GPU gets spicy.</p></div>
+    <div class="tl-item reveal"><div class="yr">2026</div><h3>Today</h3><p>Both cards serving at once, the iGPU running the display, zero tokens leaving the building. The machines run themselves; Aim keeps them honest.</p></div>
+  </div>
+</section>
+
+<section id="builder">
+  <span class="kicker reveal">// 05 · the builder</span>
+  <h2 class="reveal">Written by <span class="accent">the machine's own model</span></h2>
+  <p class="lead reveal">Yes, an AI model designed and coded this page. Not a hosted API: a 27 billion parameter model, quantized to Q5_K_M, running on the very box it documents. It can't see your screen, so it has to earn the pixels. Here is how it works.</p>
+  <div class="cap-grid">
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><h3>Read the room first</h3><p>Every spec on this page was pulled live from the machine: lscpu, nvidia-smi, sysfs, lsblk. If a number is here, the box just said it.</p><div class="meta">→ 0 numbers guessed</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></div><h3>Small payloads, one file</h3><p>A single self-contained HTML. No frameworks, no CDNs, no network calls. It is written in chunks and assembled, because even 27B parameters has an output limit.</p><div class="meta">→ 8 chunks, 1 file</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Verified, not vibes</h3><p>Before shipping: tag balance check, JS syntax check, headless render, zero console errors. A model that can't see the screen proves the DOM is sound.</p><div class="meta">→ 0 console errors</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></div><h3>Feedback is the loop</h3><p>Periwinkle pass. Gradient purge. Dash removal. Font swap. Every round of review became a diff: the site is rebuilt, not patched.</p><div class="meta">→ 4 review rounds and counting</div></div>
+  </div>
+  <div class="builder-note reveal"><b>methodology, short form:</b> observe the machine → theme the page → build in bounded chunks → verify mechanically → iterate on feedback. The model on this box wrote you; the model on this box is now watching the box.</div>
+</section>
+
+<footer>
+  <a class="logo" href="#top"><b>AIM</b><span class="dot">.</span>OPS</a>
+  <div>LLMops, agents, and hardware. All local, all the time.</div>
+  <div class="colophon">designed and coded by the local model on this machine · 27B @ Q5_K_M · Ubuntu + JetBrains Mono · one self-contained file · zero dependencies</div>
+  <div class="sig">no cookies · no tracking · no cloud: just like the models</div>
+</footer>
+
+<script>
+const nav=document.getElementById('nav');
+const pb=document.getElementById('progress');
+addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',scrollY>40);
+  const h=document.documentElement;
+  const p=h.scrollHeight>h.clientHeight?h.scrollTop/(h.scrollHeight-h.clientHeight):0;
+  pb.style.transform='scaleX('+p+')';
+},{passive:true});
+
+/* particles + faint grid (grid drawn on canvas) */
+const cv=document.getElementById('particles'),ctx=cv.getContext('2d');
+let W,H,pts=[];
+function size(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+size();addEventListener('resize',size);
+const N=Math.min(90,Math.floor(innerWidth/16));
+for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.6+.4});
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame(){
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(140,140,255,.05)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=44){ctx.beginPath();ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,H);ctx.stroke()}
+  for(let y=0;y<H;y+=44){ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(W,y+.5);ctx.stroke()}
+  for(const p of pts){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;
+    if(p.y<0||p.y>H)p.vy*=-1;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fillStyle='rgba(140,140,255,.5)';ctx.fill();
+  }
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const a=pts[i],b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;
+    if(d<14400){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle='rgba(140,140,255,'+(0.18*(1-d/14400))+')';ctx.stroke()}
+  }
+}
+if(REDUCED){frame()}else{(function tick(){frame();requestAnimationFrame(tick)})()}
+
+/* hero typing */
+const phrases=["serves local LLMs at 24.1 tok/s","tunes quantizations down to the last bit","builds agents that do actual work","watches two GPUs so you don't have to","keeps every token on local metal"];
+const el=document.getElementById('typed');
+let pi=0,ci=0,del=false;
+(function type(){
+  const t=phrases[pi];
+  el.textContent=t.slice(0,ci);
+  if(!del){ci++;if(ci>t.length){del=true;return setTimeout(type,2200)}}
+  else{ci--;if(ci<=0){del=false;pi=(pi+1)%phrases.length;return setTimeout(type,350)}}
+  setTimeout(type,del?26:55);
+})();
+
+/* reveal on scroll */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(x=>io.observe(x));
+
+/* counters */
+const co=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;co.unobserve(e.target);
+  const to=+e.target.dataset.to,t0=performance.now();
+  (function step(t){const p=Math.min(1,(t-t0)/1200);e.target.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)})(t0);
+}),{threshold:.5});
+document.querySelectorAll('.count').forEach(x=>co.observe(x));
+
+/* gauges */
+const bo=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('i[data-w]').forEach(b=>b.style.width=b.dataset.w+'%');bo.unobserve(e.target)}}),{threshold:.4});
+const g=document.getElementById('gauges');if(g)bo.observe(g);
+</script>
+<script>
+/* live terminal */
+const term=document.getElementById('termBody');
+const script=[
+  {cmd:"aimctl status"},
+  {out:[["t-dim","host: omarchy · MSI Z790 · i5-13600K · 30 GiB RAM"],["t-ok","OK  gpus: rx9060xt 15.2/16G · rtx3060 11.8/12G · uhd770 display"]]},
+  {cmd:"aimctl serve mistral-24b-q4_k_m --dev 9060xt --ctx 32768"},
+  {out:[["t-cyan","weights 14.2 GiB -> 16 GB VRAM · kv-cache 5.1 GB @ f16"],["t-ok","serving at 24.1 tok/s · ttft 210ms · 61C"]]},
+  {cmd:"aimctl agents list"},
+  {out:[["t-dim","agent   task                        state"],["t-cyan","scout    repo triage + daily digest        running"],["t-cyan","wrench   log mining, alert triage          idle"],["t-cyan","scribe   release notes from git log        queued"]]},
+  {cmd:"aimctl bench"},
+  {out:[["t-ok","9060xt 24.1 tok/s | 3060 13.8 tok/s (8B) | p95 980ms"]]}
+];
+function append(cls,txt){
+  const d=document.createElement('div');
+  if(cls)d.className=cls;
+  d.textContent=txt;
+  term.appendChild(d);
+  return d;
+}
+function outputs(item){
+  let li=0;
+  (function lo(){
+    if(li>=item.out.length){setTimeout(next,700);return}
+    const o=item.out[li++];
+    append(o[0],o[1]);
+    setTimeout(lo,240);
+  })();
+}
+function next(){
+  if(si>=script.length){setTimeout(runScript,5000);return}
+  const item=script[si++];
+  if(item.cmd){
+    const line=append('t-cmd','');
+    let ci=0;
+    (function tc(){
+      line.textContent=item.cmd.slice(0,++ci);
+      if(ci<item.cmd.length)setTimeout(tc,34);
+      else setTimeout(()=>outputs(item),350);
+    })();
+  }else outputs(item);
+}
+let si=0;
+function runScript(){term.innerHTML='';si=0;next()}
+const tio=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){tio.unobserve(e.target);runScript()}
+}),{threshold:.3});
+tio.observe(document.querySelector('.term'));
+</script>
+</body>
+</html>

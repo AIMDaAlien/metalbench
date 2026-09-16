@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		<link href="../../_app/immutable/entry/start.D4gYoLaK.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/EpTfhMQm.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/CYV9PSBC.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Dt-HX3Vu.js" rel="modulepreload">
+		<link href="../../_app/immutable/entry/app.DYE2sQBQ.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/xihTtKlq.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/0.Ke7XMtQz.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/6.B7gSO7vH.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/BVW7-WB8.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/CoXqjtI-.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/C6ACavmn.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DRByVC-c.js" rel="modulepreload">
+		<!--12qhfyh--><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI0IiBmaWxsPSIjMTAxMDE4Ii8+CiAgPHBhdGggZD0iTTIyIDIyaDg0djg0SDIyek02NCAyMnY4NE0yMiA2NGg4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzc3N2MyIiBzdHJva2Utd2lkdGg9IjQiLz4KICA8ZyB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsIHNlcmlmIiBmb250LXNpemU9IjMxIiBmb250LXdlaWdodD0iNzAwIj4KICAgIDx0ZXh0IHg9IjQzIiB5PSI0MyIgZmlsbD0iI2YwZWZmNyI+TTwvdGV4dD48dGV4dCB4PSI4NSIgeT0iNDMiIGZpbGw9IiNmMGVmZjciPkU8L3RleHQ+CiAgICA8dGV4dCB4PSI0MyIgeT0iODUiIGZpbGw9IiM3Nzc3YzIiPlQ8L3RleHQ+PHRleHQgeD0iODUiIHk9Ijg1IiBmaWxsPSIjNzc3N2MyIj5CPC90ZXh0PgogIDwvZz4KPC9zdmc+Cg=="/> <meta name="theme-color" content="#101211"/><!----><!--8noe3d--><meta name="description" content="A powersave CPU governor and f16 KV cache were costing more than half of K2-Horizon decode speed on the DDR4 Unraid box; the fixes took it from 9.5 to 22.1 tok/s with no quality loss."/><!----><title>Governor and KV tuning more than doubled MoE decode — MetalBench</title>
+		<link href="../../_app/immutable/assets/0.C-cUOf0w.css" rel="stylesheet">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[0--><!--[--><a class="skip" href="#content">Skip to content</a> <header class="site-head"><a class="wordmark" href="../../" aria-label="MetalBench home"><span class="wordmark-metal">METAL</span><span class="wordmark-bench">BENCH</span></a> <nav aria-label="Primary navigation"><!--[--><a href="../../explore">Explore</a><a href="../../compare">Compare</a><a href="../../methodology">Methodology</a><a href="../../findings">Findings</a><!--]--></nav></header> <main id="content"><!--[--><article class="article"><p class="eyebrow">FINDING / 2026-09-06</p><h1>Governor and KV tuning more than doubled MoE decode</h1><p class="lede">A powersave CPU governor and f16 KV cache were costing more than half of K2-Horizon decode speed on the DDR4 Unraid box; the fixes took it from 9.5 to 22.1 tok/s with no quality loss.</p><!--[--><p>The first K2-Horizon MoVA 36B-A4B throughput sweep on the Unraid box measured about 9.5 tok/s, barely above the much smaller dense model previously benchmarked there. The model was IQ3_XXS with CPU-offloaded experts, so the expectation was memory-bandwidth bound but not this slow.</p><p>Three changes explained the gap. The CPU frequency governor was set to powersave; forcing performance raised clocks under bursty MoE expert streaming. The KV cache moved from f16 to q8_0, halving cache bandwidth for negligible quality cost. Loading switched to mlock plus mmap so streamed expert weights stay resident.</p><p>The re-run measured 22.2 / 22.1 / 22.1 tok/s across short, reasoning, and code prompt classes: 2.3 times the baseline from configuration alone. The same q8_0 KV and mlock settings carried to the Mac build, where the model runs fully in unified memory at about 54 tok/s.</p><p>Speculative decoding was also evaluated and ruled out for this model: no MTP draft model exists for the architecture, and n-gram drafting is a poor fit for CPU-offloaded MoE where expert streaming, not logits, is the bottleneck. This matches the earlier Flash-Next MTP finding.</p><!--]--><h2>Evidence</h2><div class="table-scroll" role="region" aria-label="Selected run comparison"><table><thead><tr><th scope="col">Run</th><th scope="col">Score</th><th scope="col">Decode</th><th scope="col">Runtime</th><th scope="col">Configuration</th><th scope="col">Evidence</th></tr></thead><tbody><!--[--><tr><th scope="row"><a href="/runs/k2-iq3xxs-throughput-unraid-2026-09-06/">K2-Horizon MoVA 36B-A4B IQ3_XXS</a><small>k2-iq3xxs-throughput-unraid-2026-09-06</small></th><td>1/1</td><td>22.1 tok/s</td><td>llama.cpp</td><td>IQ3_XXS · 32,768 ctx · c1</td><td><span class="evidence" data-level="artifact-backed-local">Artifact-backed local</span><!----></td></tr><tr><th scope="row"><a href="/runs/k2-iq4xs-throughput-mac-32k-2026-09-06/">K2-Horizon MoVA 36B-A4B IQ4_XS</a><small>k2-iq4xs-throughput-mac-32k-2026-09-06</small></th><td>1/1</td><td>54.1 tok/s</td><td>llama.cpp</td><td>IQ4_XS · 32,768 ctx · c1</td><td><span class="evidence" data-level="artifact-backed-local">Artifact-backed local</span><!----></td></tr><tr><th scope="row"><a href="/runs/k2-iq4xs-throughput-mac-128k-2026-09-06/">K2-Horizon MoVA 36B-A4B IQ4_XS</a><small>k2-iq4xs-throughput-mac-128k-2026-09-06</small></th><td>1/1</td><td>53.2 tok/s</td><td>llama.cpp</td><td>IQ4_XS · 131,072 ctx · c1</td><td><span class="evidence" data-level="artifact-backed-local">Artifact-backed local</span><!----></td></tr><!--]--></tbody></table></div><!----><h2>Limitations</h2><ul><!--[--><li>Throughput sweep, not a quality battery</li><li>Single machine per configuration; no repeated reboots to confirm governor persistence</li><li>Prefill number at 128K is an end-to-end estimate, not an isolated measurement</li><!--]--></ul></article><!--]--><!----><!----></main> <footer><span>Evidence before leaderboard.</span><span>Static catalog · No tracking</span></footer><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_120zq2m = {
+						base: new URL("../..", location).pathname.slice(0, -1)
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../../_app/immutable/entry/start.D4gYoLaK.js"),
+						import("../../_app/immutable/entry/app.DYE2sQBQ.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 6],
+							data: [null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

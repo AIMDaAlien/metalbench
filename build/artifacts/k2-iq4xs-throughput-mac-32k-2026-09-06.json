@@ -1,0 +1,26 @@
+{
+  "runId": "k2-iq4xs-throughput-mac-32k-2026-09-06",
+  "benchmark": "throughput-sweep v1",
+  "description": "Three prompt classes x three runs, 512 max output tokens, temperature 0.7, concurrency 1. Decode tokens per second per run.",
+  "hardware": {
+    "profile": "Apple silicon laptop, 48 GB unified memory",
+    "notes": ["Model fully resident in unified memory", "12 CPU threads", "q8_0 KV cache", "Metal backend"]
+  },
+  "runtime": {
+    "engine": "llama.cpp (MBZUAI-IFM fork, model/K2Horizon branch, commit 35999d10)",
+    "backend": "Metal",
+    "quant": "IQ4_XS",
+    "contextTokens": 32768
+  },
+  "results": {
+    "short": { "runsTokPerSec": [54.28, 54.86, 54.83], "mean": 54.66 },
+    "reasoning": { "runsTokPerSec": [53.51, 54.87, 54.7], "mean": 54.36 },
+    "code": { "runsTokPerSec": [53.51, 53.26, 52.71], "mean": 53.16 }
+  },
+  "notes": [
+    "Prompt token counts: short 17, reasoning 45, code 25.",
+    "All runs reached the 512-token cap.",
+    "Weights plus runtime used roughly 22 GB of unified memory, leaving substantial KV headroom."
+  ],
+  "caveats": ["Throughput probe only; no quality grading in this run."]
+}
