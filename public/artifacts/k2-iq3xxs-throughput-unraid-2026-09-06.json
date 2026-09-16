@@ -1,0 +1,27 @@
+{
+  "runId": "k2-iq3xxs-throughput-unraid-2026-09-06",
+  "benchmark": "throughput-sweep v1",
+  "description": "Three prompt classes x three runs, 512 max output tokens, temperature 0.7, concurrency 1. Decode tokens per second per run.",
+  "hardware": {
+    "profile": "consumer desktop, DDR4 dual channel, 12 GB GPU",
+    "notes": ["CPU-offloaded MoE experts", "16 CPU threads", "performance governor", "q8_0 KV cache", "mlock+mmap load mode"]
+  },
+  "runtime": {
+    "engine": "llama.cpp (MBZUAI-IFM fork, model/K2Horizon branch, commit 35999d10)",
+    "backend": "CUDA (sm86)",
+    "quant": "IQ3_XXS",
+    "contextTokens": 32768
+  },
+  "results": {
+    "short": { "runsTokPerSec": [21.95, 22.28, 22.27], "mean": 22.17 },
+    "reasoning": { "runsTokPerSec": [21.82, 22.1, 22.24], "mean": 22.05 },
+    "code": { "runsTokPerSec": [21.91, 22.23, 22.16], "mean": 22.1 }
+  },
+  "baselineBeforeTuning": { "meanTokPerSec": 9.5, "configuration": "powersave governor, f16 KV cache, default load mode" },
+  "notes": [
+    "Output-token counts hit the 512 cap on all but the first short run (439), indicating a natural stop.",
+    "Prompt token counts: short 17, reasoning 45, code 25.",
+    "Speculative decoding not used: no MTP draft exists for this architecture."
+  ],
+  "caveats": ["Throughput probe only; no quality grading in this run."]
+}

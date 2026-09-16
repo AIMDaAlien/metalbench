@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ComparisonTable from '$lib/components/ComparisonTable.svelte';
+	import ScatterPlot from '$lib/components/ScatterPlot.svelte';
 	import { catalog, modelName } from '$lib/data/catalog.js';
 	import { compareRuns } from '$lib/data/comparison.js';
 	import { filterRuns, groupFamilies } from '$lib/data/explorer.js';
@@ -18,5 +19,14 @@
 <section class="section compact"><div class="filter-grid compare-filters"><label>Capability<select bind:value={capability}><option value="">All</option>{#each options(catalog.models.flatMap((m) => m.capabilities)) as item (item)}<option value={item}>{item}</option>{/each}</select></label><label>Hardware<select bind:value={hardware}><option value="">All</option>{#each catalog.hardware as item (item.slug)}<option value={item.slug}>{item.name}</option>{/each}</select></label><label>Runtime<select bind:value={runtime}><option value="">All</option>{#each options(catalog.runs.map((r) => r.runtime.name)) as item (item)}<option>{item}</option>{/each}</select></label><label>Family<select bind:value={family}><option value="">All</option>{#each options(catalog.models.map((m) => m.familySlug)) as item (item)}<option value={item}>{catalog.models.find((m) => m.familySlug === item)?.family}</option>{/each}</select></label><label>Architecture<select bind:value={architecture}><option value="">All</option>{#each options(catalog.models.map((m) => m.architecture)) as item (item)}<option value={item}>{item}</option>{/each}</select></label><label>Quant range<select bind:value={quant}><option value="">All</option><option value="2-or-less">2-bit or lower</option><option value="3-4">3–4-bit</option><option value="5-6">5–6-bit</option><option value="7-8">7–8-bit</option><option value="special">Special formats</option></select></label><label>Measured memory<select bind:value={memory}><option value="">All</option><option value="under-6">Under 6 GiB</option><option value="6-12">6–12 GiB</option><option value="12-plus">12+ GiB</option><option value="unmeasured">Not measured</option></select></label><label>Evidence level<select bind:value={evidence}><option value="">All</option>{#each options(catalog.runs.map((r) => r.evidence.level)) as item (item)}<option value={item}>{item}</option>{/each}</select></label></div>
 	<fieldset><legend>Select two or more runs</legend>{#each groups as group (group.slug)}<details class="picker-group" open><summary>{group.name}</summary><div class="check-grid">{#each group.configurations as configuration (configuration.model.slug)}{#each configuration.runs as run (run.id)}<label><input type="checkbox" checked={selected.includes(run.id)} onchange={() => toggle(run.id)} /><span><strong>{modelName(run.modelSlug)}</strong><small>{run.benchmarkSlug} · {run.runtime.name} · {run.runtime.quant}</small></span></label>{/each}{/each}</div></details>{/each}</fieldset>
 	<div class:good={comparison.compatible} class="compat" aria-live="polite"><strong>{comparison.compatible ? 'Comparable' : 'Comparison blocked'}</strong>{#each comparison.reasons as reason (reason)}<span>{reason}</span>{/each}{#each comparison.warnings as warning (warning)}<span class="warning">Warning: {warning}</span>{/each}{#if comparison.compatible && !comparison.recommendationEligible}<span>External results cannot determine a local winner.</span>{/if}</div>
-	{#if runs.length}<ComparisonTable {runs} />{/if}
+ 	{#if runs.length}<ComparisonTable {runs} />{/if}
+  	{#if runs.length > 1 && comparison.compatible}
+  		<section class="plot-card">
+  			<h2 class="plot-title">Evidence plot</h2>
+  			<p class="chart-note">Only a comparable cohort is plotted — identical hardware, benchmark, version, and task set. Bubble size is measured memory/VRAM footprint; runs without a decode measurement are listed, not drawn.</p>
+  			<ScatterPlot {runs} />
+  		</section>
+  	{:else if runs.length > 1}
+ 		<p class="chart-note">Evidence plot is hidden: the selection is not a compatible cohort. Resolve the gate above to plot quality against decode speed on one axis.</p>
+ 	{/if}
 </section>

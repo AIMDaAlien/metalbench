@@ -9,6 +9,9 @@ const routes = [
   "/methodology/",
   "/findings/",
   "/findings/speculative-decoding-memory-wall/",
+  "/findings/companion-models-need-role-specific-tests/",
+  "/models/qwen35-4b-vlm/",
+  "/runs/qwen35-4b-veyra-field-2026-09-01/",
 ];
 for (const route of routes)
   test(`renders ${route}`, async ({ page }) => {
@@ -40,11 +43,11 @@ test("explorer filters, switches metrics, resets, and opens families", async ({ 
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/explore/");
   await page.getByLabel("Hardware").selectOption("macbook-pro-m5-pro-48gb");
-  await expect(page.getByText(/of 15 runs shown/)).toBeVisible();
+  await expect(page.getByText(/of 18 runs shown/)).toBeVisible();
   await page.getByRole("tab", { name: "Decode speed" }).click();
   await expect(page.getByRole("tab", { name: "Decode speed" })).toHaveAttribute("aria-selected", "true");
   await page.getByRole("button", { name: "Reset filters" }).click();
-  await expect(page.getByText("15 of 15 runs shown")).toBeVisible();
+  await expect(page.getByText("18 of 18 runs shown")).toBeVisible();
   await expect(page.locator(".family-group summary strong").filter({ hasText: /^Qwen3\.8$/ })).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -59,4 +62,16 @@ test("explorer remains usable at 375px", async ({ page }) => {
 test("unknown records are 404", async ({ request }) => {
   expect((await request.get("/runs/not-a-run/")).status()).toBe(404);
   expect((await request.get("/models/not-a-model/")).status()).toBe(404);
+});
+test("evidence plot follows the compatibility gate", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (msg) => { if (["error", "warning"].includes(msg.type())) errors.push(msg.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/compare/");
+  await expect(page.getByRole("heading", { name: "Evidence plot" })).toBeVisible();
+  await expect(page.getByText("Footprint", { exact: true })).toBeVisible(); // receipt header
+  await page.getByLabel(/Flash-Next IQ3_XXS/).check();                    // breaks the cohort
+  await expect(page.getByText(/Evidence plot is hidden/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Evidence plot" })).toHaveCount(0);
+  expect(errors).toEqual([]);
 });

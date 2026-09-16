@@ -1,0 +1,32 @@
+{
+  "runId": "k2-iq4xs-throughput-mac-128k-2026-09-06",
+  "benchmark": "throughput-sweep v1",
+  "description": "Three prompt classes x three runs, 512 max output tokens, temperature 0.7, concurrency 1, at 131072-token context. Decode tokens per second per run, plus a long-prompt prefill probe.",
+  "hardware": {
+    "profile": "Apple silicon laptop, 48 GB unified memory",
+    "notes": ["Model fully resident in unified memory", "12 CPU threads", "q8_0 KV cache", "Metal backend"]
+  },
+  "runtime": {
+    "engine": "llama.cpp (MBZUAI-IFM fork, model/K2Horizon branch, commit 35999d10)",
+    "backend": "Metal",
+    "quant": "IQ4_XS",
+    "contextTokens": 131072
+  },
+  "results": {
+    "short": { "runsTokPerSec": [54.28, 54.86, 54.49], "mean": 54.49 },
+    "reasoning": { "runsTokPerSec": [53.5, 54.52, 54.27], "mean": 54.1 },
+    "code": { "runsTokPerSec": [52.66, 50.83, 49.68], "mean": 51.06 }
+  },
+  "prefillProbe": {
+    "promptTokens": 32360,
+    "maxOutputTokens": 256,
+    "wallSeconds": 130.2,
+    "effectiveTokensPerSecEndToEnd": 250,
+    "note": "Prefill dominates wall time; the rate is an end-to-end estimate including decode, not an isolated prefill measurement."
+  },
+  "notes": [
+    "Decode speed is essentially flat versus the 32K-context run; context length itself costs little at these prompt sizes.",
+    "Long-context use is prefill-bound, not decode-bound."
+  ],
+  "caveats": ["Throughput probe only; no quality grading in this run."]
+}

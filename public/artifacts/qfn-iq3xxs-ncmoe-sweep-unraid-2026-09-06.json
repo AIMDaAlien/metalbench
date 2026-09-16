@@ -1,0 +1,28 @@
+{
+  "runId": "qfn-iq3xxs-ncmoe-sweep-unraid-2026-09-06",
+  "benchmark": "throughput-sweep v1 (ncmoe variant)",
+  "description": "llama-bench tg128 sweep across expert-layer offload counts (ncmoe N = number of MoE layers keeping experts on CPU). Small fixed context; exposes the VRAM frontier.",
+  "hardware": {
+    "profile": "consumer desktop, DDR4 dual channel, 12 GB GPU",
+    "notes": ["12 GB RTX 3060, compute capability 8.6", "PLE n-gram table pinned to CPU via tensor override"]
+  },
+  "runtime": {
+    "engine": "llama.cpp",
+    "version": "master 2026-09-06 or later, CUDA, llama-bench",
+    "quant": "IQ3_XXS",
+    "contextTokens": 512
+  },
+  "results": {
+    "ncmoe48": { "tg128TokPerSec": 13.61, "loaded": true },
+    "ncmoe46": { "tg128TokPerSec": 15.78, "loaded": true },
+    "ncmoe44": { "tg128TokPerSec": 18.36, "loaded": true },
+    "ncmoe42": { "tg128TokPerSec": 18.86, "loaded": true },
+    "ncmoe40": { "tg128TokPerSec": null, "loaded": false, "error": "cudaMalloc out of memory" }
+  },
+  "notes": [
+    "ncmoe 42/44 are the peak-throughput configs but fail to load once the full 262144-token KV and compute buffers are added (1224 MiB KV allocation OOM).",
+    "The long-context configuration therefore runs ncmoe 48 at about 14.7 tok/s; the short-context fast configuration is ncmoe 42-44 at up to 18.9 tok/s.",
+    "The tradeoff is a one-line entrypoint switch: CTX_SIZE plus ncmoe."
+  ],
+  "caveats": ["Sweep ran at 512-token context; long-context load behavior tested separately with the real 262K server."]
+}
