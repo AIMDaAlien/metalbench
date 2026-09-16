@@ -1,4 +1,4 @@
-metalbench.penthouse.blog {
+metalbench.teardown.cafe {
 	root * /srv/metalbench
 	encode zstd gzip
 	header {

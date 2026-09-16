@@ -4,14 +4,14 @@ This doc tells **the other machine** (Machine B) what to do so that your one tes
 webpage shows up in the fleet as a proper leaderboard entry — and links to what it created.
 
 Read it top to bottom, in order. Do not skip steps. Everything below assumes you are
-not the author of `github.com/AIMDaAlien/the-penthouse-metalbench` — you are committing
+not the author of `github.com/AIMDaAlien/metalbench` — you are committing
 *your* result into it.
 
 ---
 
 ## 0. What this fleet actually is (so you don't reinvent it)
 
-`github.com/AIMDaAlien/the-penthouse-metalbench` is a **static SvelteKit site**. It has
+`github.com/AIMDaAlien/metalbench` is a **static SvelteKit site**. It has
 no SPA fallback and no server. The content is authored in **one** file:
 
 ```
@@ -40,7 +40,7 @@ builds and passes the fleet's own validation, then commit.
 On Machine B, from any empty directory:
 
 ```bash
-git clone https://github.com/AIMDaAlien/the-penthouse-metalbench.git metalbench
+git clone https://github.com/AIMDaAlien/metalbench.git metalbench
 cd metalbench
 npm install
 ```
@@ -131,18 +131,18 @@ Do not edit `build/` by hand — the build regenerates it. Do not touch sibling 
 ## 5. Publish the tested webpage (two options — pick one)
 
 The fleet's `.gitignore` excludes `build/`, so the prerendered site is **not** committed
-by default. It is deployed to Unraid via Caddy at `https://metalbench.penthouse.blog/`
+by default. It is deployed to Unraid via Caddy at `https://metalbench.teardown.cafe/`
 (see `docs/deployment.md`). Choose how your page reaches a user:
 
 **Option A (recommended — deploy to the fleet's host):**
 After building (§7), copy `build/` to your staging area on the Unraid host and promote it
 exactly as `docs/deployment.md` describes (back up → copy staging → add the Caddy
 configuration → `caddy validate` → atomic rename → reload → check public routes). Your new
-page is reachable at `https://metalbench.penthouse.blog/models/<modelSlug>/` and
+page is reachable at `https://metalbench.teardown.cafe/models/<modelSlug>/` and
 `.../runs/<runId>/`.
 
 **Option B (commit the prerendered snapshot into this repo):**
-If you want the tested webpage committed *into* `the-penthouse-metalbench` (so anyone
+If you want the tested webpage committed *into* `metalbench` (so anyone
 cloning it sees the finished page), run `npm run build` (§7) then force-add only your new
 pages:
 
@@ -195,16 +195,16 @@ Keep the commit message short and evidence-first, like the fleet's history (`doc
 
 ```bash
 git ls-remote --heads origin main
-curl -s https://github.com/AIMDaAlien/the-penthouse-metalbench/main/build/models/<modelSlug>/ | head -c 200
+curl -s https://github.com/AIMDaAlien/metalbench/main/build/models/<modelSlug>/ | head -c 200
 ```
 
-(For Option A the canonical proof is `https://metalbench.penthouse.blog/models/<modelSlug>/`.)
+(For Option A the canonical proof is `https://metalbench.teardown.cafe/models/<modelSlug>/`.)
 
 ---
 
 ## 8. What "done" looks like (checklist)
 
-- [ ] Cloned `github.com/AIMDaAlien/the-penthouse-metalbench` and ran `npm install`.
+- [ ] Cloned `github.com/AIMDaAlien/metalbench` and ran `npm install`.
 - [ ] Located your own produced webpage / result (if truly not found, STOP and report it).
 - [ ] Chose a unique `runId` (lower-case slug + date) that doesn't already exist.
 - [ ] Added a `BigRig` hardware entry + your `modelSlug` model entry to `catalog.json`.
