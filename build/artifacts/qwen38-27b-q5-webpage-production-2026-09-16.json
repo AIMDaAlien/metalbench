@@ -3,17 +3,25 @@
   "benchmark": "webpage-production v1",
   "description": "One open-ended production brief: build a complete, self-contained product webpage for a local-AI operations persona. Graded by deterministic render, console, asset, and style checks; no LLM judge.",
   "hardware": {
-    "profile": "BigRig: Intel Core i5-13600K (14 cores / 20 threads), 30 GB DDR5, AMD RX 9060 XT 16 GB + NVIDIA RTX 3060 12 GB",
+    "profile": "BigRig: MSI PRO Z690-A WIFI (MS-7D25), Intel Core i5-13600K (14C/20T, 5.1 GHz), 32 GB DDR4-3600, AMD RX 9060 XT 16 GB + NVIDIA RTX 3060 12 GB, UHD 770 display",
     "notes": [
-      "Dual-GPU desktop; integrated UHD 770 carries the display so both dGPUs stay available for compute",
+      "Dual-GPU desktop; the integrated UHD 770 carries the display so both dGPUs stay available for compute",
       "952 GB NVMe root with large headroom for working sets"
     ]
   },
   "runtime": {
-    "engine": "opencode agent session",
-    "model": "Swift-Qwen3.8-27B-Q5_K_M.gguf (27B dense, Q5_K_M)",
+    "engine": "opencode agent session on llama-server 0.4.0-dev (build 10809, commit 5266f24da7), Vulkan backend",
+    "model": "Swift-Qwen3.8-27B-Q5_K_M.gguf (27.3B dense, Q5_K_M, 20 GB)",
     "quant": "Q5_K_M",
-    "contextTokens": 32768
+    "contextTokens": 131072,
+    "command": "llama-server -m Swift-Qwen3.8-27B-Q5_K_M.gguf -c 131072 -fa on -ctk q8_0 -ctv q8_0 -dev Vulkan0,Vulkan1 -sm layer -ts 16,11 --spec-type draft-mtp --spec-draft-n-max 2 -ctkd q8_0 -ctvd q8_0 --host loopback --port 8080",
+    "nonDefaults": [
+      "128K context (llama.cpp default 4K)",
+      "flash attention on (default off)",
+      "q8_0 K/V cache and draft K/V cache (default f16); the f16 draft KV overflowed the 12 GB card at 128K and crash-looped until quantized",
+      "MTP speculative decoding n=2 (default off); draft acceptance about 63-70 percent, +71 to +98 percent decode vs the no-spec baseline",
+      "layer split across both dGPUs, tensor split 16-11 matching the 16 GB / 12 GB VRAM ratio (default single device)"
+    ]
   },
   "result": {
     "artifactPage": "/webpages/qwen38-27b-q5/",
@@ -28,12 +36,22 @@
       "No gradients, emoji, or substituted dashes in the final page",
       "HTML tag balance verified",
       "Embedded JavaScript passes node --check",
-      "All local font references resolve against the shipped fonts directory"
+      "All local font references resolve against the shipped fonts directory",
+      "Every hardware figure on the page re-verified against lscpu, sysfs, lsblk, nvidia-smi, and the live llama-server process"
     ]
+  },
+  "documentedPerformance": {
+    "source": "bench log suite on this box, 2026-09-15 (not measured during this run)",
+    "agentDecodeWithMtp": "24.1 / 25.4 / 22.7 tok/s across three 400-token agent rounds",
+    "agentDecodeNoSpec": "14.1 / 14.1 / 14.2 tok/s on the same rounds",
+    "longGen1024": "24.9-25.3 tok/s with MTP vs 14.3 without",
+    "prefill": "345.7 tok/s at 4K, 447.5 at 16K, 412.4 at 32K (MTP config; no-spec is faster raw: 755.6 at 16K)",
+    "longContext": "80K: 328 tok/s prefill, 14.1 tok/s decode; 120K: 276 tok/s prefill, 12.4 tok/s decode",
+    "codingSuite": "93/112 deterministic checks across 40 tasks (swe40); 6/6 on the short MTP coding eval"
   },
   "notes": [
     "Completion task: the score records that the page was produced and passes its checks, not model quality",
-    "No decode or prefill throughput was measured in this run",
+    "No decode or prefill throughput was measured in this run; the model under test is the model that wrote the page",
     "JetBrains Mono falls back to the system mono stack when absent; the three Ubuntu faces are committed with the page"
   ]
 }
