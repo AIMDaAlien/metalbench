@@ -376,15 +376,19 @@
       "slug": "bigrig",
       "name": "BigRig",
       "cpu": "Intel Core i5-13600K (14 cores / 20 threads, 5.1 GHz boost)",
-      "memory": "30 GB DDR5",
-      "gpu": "AMD Radeon RX 9060 XT 16 GB + NVIDIA RTX 3060 12 GB",
+      "memory": "32 GB DDR4-3600",
+      "gpu": "AMD Radeon RX 9060 XT 16 GB + NVIDIA RTX 3060 12 GB (integrated UHD 770 carries the display)",
       "publicNotes": [
-        "Dual-GPU desktop; the RX 9060 XT is primary, the RTX 3060 is secondary",
-        "Display runs off the integrated UHD 770, leaving both dGPUs for compute",
+        "Dual-GPU desktop on a MSI PRO Z690-A WIFI board (MS-7D25); the iGPU runs the display, leaving both dGPUs for compute",
+        "One llama.cpp server drives both dGPUs through Vulkan (RADV on the 9060 XT, NVIDIA Vulkan on the 3060); whole layers split 16-11 (-sm layer -ts 16,11) to match the 16 GB / 12 GB VRAM ratio",
+        "Daily config changed from llama.cpp defaults for this model: 128K context (default 4K), flash attention on, q8_0 KV cache (default f16), MTP speculative decoding n=2 (default off)",
+        "MTP adds +71 to +98 percent decode (14.1 to 24.1 tok/s on 400-token agent rounds) at a cost of roughly 40 percent raw prefill on uncached prompts; agent prefix caching absorbs that",
+        "Draft-model KV must be quantized (-ctkd/-ctvd q8_0); at 128K context the f16 draft KV overflows the 12 GB card and crash-looped until it was set",
+        "llama-switch toggles three modes: mtp (daily 128K), deep (256K, q5_1 KV, no spec), split (one card per agent lane on separate ports)",
         "952 GB NVMe root with large headroom for working sets"
       ],
-      "memoryBudget": "Keep weights, KV cache, and runtime overhead under 30 GB host RAM; the two GPUs give 28 GB of combined VRAM for a layer split.",
-      "bottleneck": "27B dense decode is memory-bandwidth bound; with 30 GB system RAM, long-context KV cache is the first thing to pressure the box."
+      "memoryBudget": "The 20 GB Q5_K_M weight set plus 128K q8_0 KV cache fit in 28 GB combined VRAM (about 15.4 GiB + 11.6 GiB in use); the 32 GB DDR4-3600 host RAM is the offload tier and stays out of the hot path.",
+      "bottleneck": "27B dense decode is memory-bandwidth bound across two VRAM pools; documented decode falls from 19.5 tok/s at 28K context to 14.1 at 80K and 12.4 at 120K as the KV cache grows, which is why the 256K deep mode drops speculative decoding."
     }
   ],
   "benchmarks": [
@@ -924,10 +928,10 @@
       "benchmarkVersion": "1",
       "taskSetHash": "sha256:webpage-production-v1-single-brief",
       "runtime": {
-        "name": "opencode",
-        "version": "local session 2026-09-16",
+        "name": "opencode on llama-server (Vulkan)",
+        "version": "0.4.0-dev build 10809 commit 5266f24da7",
         "quant": "Q5_K_M",
-        "contextTokens": 32768,
+        "contextTokens": 131072,
         "concurrency": 1
       },
       "score": { "passed": 1, "total": 1, "metric": "webpage produced" },
@@ -935,12 +939,14 @@
       "evidence": {
         "level": "artifact-backed-local",
         "artifactUrl": "/artifacts/qwen38-27b-q5-webpage-production-2026-09-16.json",
-        "sha256": "7e3b1d01094aa3b911a74600cd5cb1d67af252aa3e1d05e6a564006818204b7c",
+        "sha256": "4081c7f76f8d8ffc42891282717cb228ca67167a51004909a05c63fd71db4c46",
         "harnessCommit": "opencode-agent-session-2026-09-16"
       },
       "caveats": [
         "Completion task: 1/1 records that the page was produced and passes its checks, not answer quality",
-        "No decode or prefill throughput was measured on this box for this quant",
+        "Server config as documented in the BigRig hardware profile: dual-GPU Vulkan layer split 16-11, flash attention, q8_0 KV, MTP n=2, 128K context, loopback only",
+        "The page cites bench numbers documented on 2026-09-15 (24.1 tok/s agent decode with MTP; 93/112 on the 40-task coding suite), not measurements from this session",
+        "No fresh throughput was measured for this run; the model under test is the model that wrote the page",
         "The page ships three Ubuntu TTFs; JetBrains Mono falls back to the system mono stack when absent"
       ]
     }

@@ -50,6 +50,11 @@
 </style>
 <style>
   header{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 6vw 60px;position:relative}
+  .serve{margin-top:26px;padding:20px 22px;border:1px solid var(--panel-br);border-radius:14px;background:var(--panel)}
+  .serve .s-k{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;color:var(--peri);margin-bottom:12px}
+  .serve ul{list-style:none;display:grid;gap:9px;margin:0;padding:0}
+  .serve li{font-family:var(--mono);font-size:.82rem;line-height:1.65;color:var(--muted)}
+  .serve li b{color:var(--text);font-weight:500}
   .status-pill{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;color:var(--peri-hi);border:1px solid rgba(140,140,255,.4);background:var(--peri-faint);padding:7px 16px;border-radius:999px;width:fit-content;margin-bottom:28px}
   .pulse{width:8px;height:8px;border-radius:50%;background:var(--peri-hi);box-shadow:0 0 0 0 rgba(140,140,255,.6);animation:pulse 2s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(140,140,255,.55)}70%{box-shadow:0 0 0 10px rgba(140,140,255,0)}100%{box-shadow:0 0 0 0 rgba(140,140,255,0)}}
@@ -178,7 +183,7 @@
   <div class="stats">
     <div class="stat"><div class="num"><span class="count" data-to="28">0</span><small>GB VRAM</small></div><div class="lbl">across two serving GPUs</div></div>
     <div class="stat"><div class="num"><span class="count" data-to="3">0</span><small>GPUs</small></div><div class="lbl">one box, three jobs</div></div>
-    <div class="stat"><div class="num"><span class="count" data-to="30">0</span><small>GiB RAM</small></div><div class="lbl">DDR5 + offload tier</div></div>
+    <div class="stat"><div class="num"><span class="count" data-to="32">0</span><small>GB RAM</small></div><div class="lbl">DDR4-3600 + offload tier</div></div>
     <div class="stat"><div class="num"><span class="count" data-to="0">0</span><small>tokens</small></div><div class="lbl">sent to the cloud, ever</div></div>
   </div>
 </header>
@@ -193,7 +198,7 @@
   <div class="about-grid">
     <div class="about-copy reveal">
       <p>Aim is the person you call when a 24B model refuses to fit in VRAM, when an agent loop burns through context like it's free, and when the 9060 XT hits 84°C at 2 a.m. <strong>LLMops is the job</strong>: the unglamorous, deeply satisfying work of making large models run reliably on the machines in the room next to you.</p>
-      <p>This one machine is the whole fleet: an <strong>i5-13600K</strong> on a Z790 board, <strong>30 GiB of DDR5</strong>, and three GPUs doing three jobs. The <strong>Radeon RX 9060 XT</strong> serves the big model, the <strong>RTX 3060</strong> serves the small one, and the <strong>UHD 770</strong> runs the display. All inference on hardware that never phones home.</p>
+      <p>This one machine is the whole fleet: an <strong>i5-13600K</strong> on a Z690 board, <strong>32 GB of DDR4-3600</strong>, and three GPUs doing three jobs. The <strong>Radeon RX 9060 XT</strong> serves the big model, the <strong>RTX 3060</strong> serves the small one, and the <strong>UHD 770</strong> runs the display. All inference on hardware that never phones home.</p>
       <p>The philosophy is simple: <strong>if it fits on local metal, it lives on local metal.</strong> Privacy is a feature, latency is a choice, and the cloud is just someone else's computer you pay to rent, and you already own the other one.</p>
       <div class="tags">
         <span class="tag">llama.cpp</span><span class="tag">vLLM</span><span class="tag">GGUF</span><span class="tag">Q4_K_M / Q5_K_S</span><span class="tag">RAG</span><span class="tag">function calling</span><span class="tag">agent orchestration</span><span class="tag">n8n</span><span class="tag">Docker</span><span class="tag">Grafana</span><span class="tag">ROCm</span><span class="tag">CUDA</span>
@@ -210,8 +215,8 @@
   <h2 class="reveal">The <span class="accent">stack</span>, layer by layer</h2>
   <p class="lead reveal">Six hats, one job: models that answer, agents that act, and hardware that survives it.</p>
   <div class="cap-grid">
-    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01M10 6.5h.01M10 17.5h.01"/></svg></div><h3>Model Serving</h3><p>Wrangling LLMs into fast, stable endpoints. llama.cpp, vLLM, continuous batching, and just enough CUDA to be dangerous.</p><div class="meta">→ 24.1 tok/s on the 9060 XT</div></div>
-    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg></div><h3>Quantization</h3><p>Finding the knife-edge between quality and memory. Q4_K_M by day, tensor-wise experiments by night, perplexity charts as mood board.</p><div class="meta">→ 14.2 GiB resident</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 6.5h.01M6 17.5h.01M10 6.5h.01M10 17.5h.01"/></svg></div><h3>Model Serving</h3><p>Wrangling LLMs into fast, stable endpoints. llama.cpp, vLLM, continuous batching, and just enough CUDA to be dangerous.</p><div class="meta">→ 24.1 tok/s agent decode, dual-GPU MTP</div></div>
+    <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg></div><h3>Quantization</h3><p>Finding the knife-edge between quality and memory. Q4_K_M by day, tensor-wise experiments by night, perplexity charts as mood board.</p><div class="meta">→ 20 GB of Q5_K_M weights split 16-11</div></div>
     <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 8V5"/><circle cx="12" cy="4" r="1"/><path d="M9.5 13h.01M14.5 13h.01"/><path d="M9 16h6"/></svg></div><h3>Agent Engineering</h3><p>Tool-using agents with scoped permissions, retries, and circuit breakers, so automation helps instead of haunting the house.</p><div class="meta">→ 3 agents in rotation</div></div>
     <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></div><h3>RAG Pipelines</h3><p>Chunking, embedding, and reranking local corpora so answers come from <em>your</em> docs, not the model's imagination.</p><div class="meta">→ 1.2M vectors indexed</div></div>
     <div class="cap reveal"><div class="ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Observability</h3><p>Every token, millisecond, and degree Celsius on a dashboard. If it isn't graphed, it doesn't exist. If it isn't alerting, it's a surprise.</p><div class="meta">→ 99.7% uptime</div></div>
@@ -222,22 +227,31 @@
 <section id="hardware">
   <span class="kicker reveal">// 03 · the machine, live</span>
   <h2 class="reveal">The <span class="accent">machine</span></h2>
-  <p class="lead reveal">One MSI Z790 board, two GPUs serving right now, an iGPU running the display, and enough NVMe for the model zoo. Every number below is what this box reports today.</p>
+  <p class="lead reveal">One MSI PRO Z690-A board, one llama-server driving both dGPUs through Vulkan, an iGPU running the display, and enough NVMe for the model zoo. Every number below is what this box reports today.</p>
   <div class="hw-grid">
-    <div class="chip reveal"><div class="temp">61°C</div><div class="k">GPU · primary</div><div class="v">RX 9060 XT<small>16 GB GDDR6 · 15.2 GB in use right now</small></div></div>
-    <div class="chip reveal"><div class="temp">58°C</div><div class="k">GPU · secondary</div><div class="v">RTX 3060<small>12 GB GDDR6 · 11.8 GB in use, 64% util</small></div></div>
+    <div class="chip reveal"><div class="temp">61°C</div><div class="k">GPU · primary</div><div class="v">RX 9060 XT<small>16 GB GDDR6 · 15.4 GB in use right now</small></div></div>
+    <div class="chip reveal"><div class="temp">63°C</div><div class="k">GPU · secondary</div><div class="v">RTX 3060<small>12 GB GDDR6 · 11.6 GB in use, 63% util</small></div></div>
     <div class="chip reveal"><div class="k">GPU · display</div><div class="v">UHD 770<small>iGPU · runs the desktop, keeps a cool head</small></div></div>
     <div class="chip reveal"><div class="k">CPU</div><div class="v">i5-13600K<small>14c/20t up to 5.1 GHz · offload + orchestration</small></div></div>
-    <div class="chip reveal"><div class="k">Memory</div><div class="v">30 GiB DDR5<small>10 GiB in use · offload tier + agent state</small></div></div>
+    <div class="chip reveal"><div class="k">Memory</div><div class="v">32 GB DDR4-3600<small>17 GiB in use · offload tier + agent state</small></div></div>
     <div class="chip reveal"><div class="k">Storage · root</div><div class="v">952 GB NVMe<small>ORICO J20 Pro · 8% used · the model zoo</small></div></div>
     <div class="chip reveal"><div class="k">Storage · extras</div><div class="v">1 TB + 1.9 TB<small>Crucial MX500 + TEAM SSD · backups + datasets</small></div></div>
-    <div class="chip reveal"><div class="k">Board / net</div><div class="v">MSI Z790<small>MS-7D25 · Wi-Fi 6E (Intel CNVi)</small></div></div>
+    <div class="chip reveal"><div class="k">Board / net</div><div class="v">MSI PRO Z690-A WIFI<small>MS-7D25 · Wi-Fi 6E (Intel CNVi)</small></div></div>
   </div>
   <div class="gauges reveal" id="gauges">
-    <div class="gauge"><div class="gauge-head"><span class="g-name">RX 9060 XT · VRAM (weights + kv-cache)</span><span class="g-val">15.2 / 16 GB</span></div><div class="bar"><i data-w="95"></i></div></div>
-    <div class="gauge"><div class="gauge-head"><span class="g-name">RTX 3060 · VRAM (weights + kv-cache)</span><span class="g-val">11.8 / 12 GB</span></div><div class="bar"><i data-w="96"></i></div></div>
-    <div class="gauge"><div class="gauge-head"><span class="g-name">RAM · DDR5 + offload tier</span><span class="g-val">10 / 30 GiB</span></div><div class="bar"><i data-w="34"></i></div></div>
+    <div class="gauge"><div class="gauge-head"><span class="g-name">RX 9060 XT · VRAM (weights + kv-cache)</span><span class="g-val">15.4 / 16 GB</span></div><div class="bar"><i data-w="96"></i></div></div>
+    <div class="gauge"><div class="gauge-head"><span class="g-name">RTX 3060 · VRAM (weights + kv-cache)</span><span class="g-val">11.6 / 12 GB</span></div><div class="bar"><i data-w="97"></i></div></div>
+    <div class="gauge"><div class="gauge-head"><span class="g-name">RAM · DDR4-3600 + offload tier</span><span class="g-val">17 / 32 GiB</span></div><div class="bar"><i data-w="53"></i></div></div>
     <div class="gauge"><div class="gauge-head"><span class="g-name">Root NVMe · model zoo</span><span class="g-val">67 / 952 GB</span></div><div class="bar"><i data-w="8"></i></div></div>
+  </div>
+  <div class="serve reveal">
+    <div class="s-k">// how the two cards share one model</div>
+    <ul>
+      <li><b>One llama-server, both dGPUs over Vulkan</b> (radv on the 9060 XT, NVIDIA driver on the 3060). Whole layers split 16-11 to match the 16 GB / 12 GB VRAM ratio: -sm layer -ts 16,11.</li>
+      <li><b>Changed from llama.cpp defaults for this model:</b> 128K context (default 4K), flash attention on, q8_0 KV cache (default f16), MTP speculative decoding n=2 (default off).</li>
+      <li><b>Documented 2026-09-15:</b> 24.1 tok/s agent decode with MTP vs 14.1 without (+71-98%); 412 tok/s prefill at 32K; 93/112 checks on a 40-task coding suite. Draft KV must be quantized (q8_0) or the 12 GB card crash-loops at 128K.</li>
+      <li><b>llama-switch:</b> mtp (daily 128K) · deep (256K, q5_1 KV, no spec) · split (one card per agent lane, AMD on 8080 / NVIDIA on 8081).</li>
+    </ul>
   </div>
 </section>
 <section id="timeline">
@@ -245,7 +259,7 @@
   <h2 class="reveal">A short <span class="accent">history</span> of the lab</h2>
   <div class="timeline">
     <div class="tl-item reveal"><div class="yr">2023</div><h3>First GPU</h3><p>A used RTX 3060, a 7B model, and the moment it becomes obvious that "local" was never a compromise: it was the whole point.</p></div>
-    <div class="tl-item reveal"><div class="yr">2024</div><h3>The 9060 XT joins</h3><p>16 GB of GDDR6 lands on the Z790. The model that didn't fit now does. The first agent starts running on cron, and it triaged logs badly, but it did it privately.</p></div>
+    <div class="tl-item reveal"><div class="yr">2024</div><h3>The 9060 XT joins</h3><p>16 GB of GDDR6 lands on the Z690. The model that didn't fit now does. The first agent starts running on cron, and it triaged logs badly, but it did it privately.</p></div>
     <div class="tl-item reveal"><div class="yr">2025</div><h3>The agent fleet</h3><p>Three agents with real tools, real memory, and real job descriptions. Dashboards for everything. An incident channel for when a GPU gets spicy.</p></div>
     <div class="tl-item reveal"><div class="yr">2026</div><h3>Today</h3><p>Both cards serving at once, the iGPU running the display, zero tokens leaving the building. The machines run themselves; Aim keeps them honest.</p></div>
   </div>
@@ -340,13 +354,13 @@ const g=document.getElementById('gauges');if(g)bo.observe(g);
 const term=document.getElementById('termBody');
 const script=[
   {cmd:"aimctl status"},
-  {out:[["t-dim","host: omarchy · MSI Z790 · i5-13600K · 30 GiB RAM"],["t-ok","OK  gpus: rx9060xt 15.2/16G · rtx3060 11.8/12G · uhd770 display"]]},
+  {out:[["t-dim","host: omarchy · msi pro z690-a · i5-13600k · 32gb ddr4-3600"],["t-ok","OK  gpus: rx9060xt 15.4/16G · rtx3060 11.6/12G · uhd770 display"]]},
   {cmd:"aimctl serve mistral-24b-q4_k_m --dev 9060xt --ctx 32768"},
-  {out:[["t-cyan","weights 14.2 GiB -> 16 GB VRAM · kv-cache 5.1 GB @ f16"],["t-ok","serving at 24.1 tok/s · ttft 210ms · 61C"]]},
+  {out:[["t-cyan","weights 20 GB -> 16+12 GB VRAM, 16-11 layer split · kv q8_0 @ 128K"],["t-ok","serving at 24.1 tok/s · ttft 210ms · 61C"]]},
   {cmd:"aimctl agents list"},
   {out:[["t-dim","agent   task                        state"],["t-cyan","scout    repo triage + daily digest        running"],["t-cyan","wrench   log mining, alert triage          idle"],["t-cyan","scribe   release notes from git log        queued"]]},
   {cmd:"aimctl bench"},
-  {out:[["t-ok","9060xt 24.1 tok/s | 3060 13.8 tok/s (8B) | p95 980ms"]]}
+  {out:[["t-ok","dual-gpu vulkan · 24.1 tok/s decode (mtp n=2) · 32k prefill 412 tok/s"]]}
 ];
 function append(cls,txt){
   const d=document.createElement('div');
